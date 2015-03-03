@@ -9,6 +9,9 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.*;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.teachandroid.app.R;
 import com.teachandroid.app.store.SessionStore;
 import com.teachandroid.app.util.Logger;
@@ -79,6 +82,7 @@ public class LoginActivity extends Activity {
                 }
             }, 1500);
         }
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getApplicationContext()));
     }
 
     private class VkClient extends WebViewClient {

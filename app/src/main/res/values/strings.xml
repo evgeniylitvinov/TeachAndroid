@@ -10,5 +10,13 @@
     <string name="dialogs">Dialogs</string>
     <string name="audios">Audios</string>
     <string name="groups">Groups</string>
+    <string name="relogin">reLogin</string>
+    <string name="title_activity_dialog">DialogActivity</string>
+    <string name="text_dialog_owner">dialog owner</string>
+    <string name="text_dialog_unread_message">unread message</string>
+    <string name="title_activity_message">MessageActivity</string>
+    <string name="text_message_owner">message owner</string>
+    <string name="text_dialog_title">Title</string>
+    <string name="text_message_body">Body</string>
 
 </resources>

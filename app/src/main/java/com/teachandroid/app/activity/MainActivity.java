@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import com.teachandroid.app.R;
+import com.teachandroid.app.store.SessionStore;
 
 public class MainActivity extends Activity {
 
@@ -17,6 +18,25 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, AudioActivity.class));
+            }
+        });
+        findViewById(R.id.button_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, DialogActivity.class));
+            }
+        });
+        findViewById(R.id.button_group).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, GroupActivity.class));
+            }
+        });
+        findViewById(R.id.button_relogin).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SessionStore.reLogin(MainActivity.this);
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
             }
         });
     }

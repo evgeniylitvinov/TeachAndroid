@@ -13,8 +13,10 @@ import com.teachandroid.app.util.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -88,7 +90,8 @@ public class ApiFacade {
                     HttpResponse response = httpClient.execute(request);
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                    Logger.log(TAG,"json groups request-",response.getEntity().getContent().toString());
+
+                    Logger.log(TAG,"json groups request-", EntityUtils.toString(response.getEntity()));
 
                     ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Group>>>() {
                     }.getType());

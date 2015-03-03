@@ -14,8 +14,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -106,7 +108,47 @@ public class ApiFacade {
 
     }
 
-    public void getUserAudio(String userId){
+    public void searchAudio(final String audioKeyWord){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
+                urlBuilder.append("audio.search");
+                urlBuilder.append("?");
+                try {
+                    urlBuilder.append("q").append("=").append(URLEncoder.encode(audioKeyWord, "UTF-8")).append("&");
+                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
+                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
+                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
+                }catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
+                }
+                HttpURLConnection connection = null;
+                try {
+                    String urlString = urlBuilder.toString();
+
+                    Logger.log(TAG, "url request " + urlString);
+
+                    URL url = new URL(urlString);
+                    connection = (HttpURLConnection) url.openConnection();
+                    InputStream in = connection.getInputStream();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    String line = null;
+                    while ((line = reader.readLine()) != null){
+                        Logger.log(TAG, "url response " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }
+        }).start();
 
     }
+
+
 }

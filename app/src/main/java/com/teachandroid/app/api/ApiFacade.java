@@ -91,10 +91,10 @@ public class ApiFacade {
                     HttpResponse response = httpClient.execute(request);
 
                     //BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                    String resstr=EntityUtils.toString(response.getEntity());
-                    Logger.log(TAG,"json groups request-", resstr);
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    Logger.log(TAG,"json groups request " + responseString);
 
-                    ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(resstr, new TypeToken<ApiResponse<ResponseList<Group>>>() {
+                    ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(responseString, new TypeToken<ApiResponse<ResponseList<Group>>>() {
                     }.getType());
                     if(apiResponse != null){
                         listener.onResponse(apiResponse.getResult().getItems());

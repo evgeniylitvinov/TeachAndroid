@@ -39,8 +39,15 @@ public class AudioActivity extends ActionBarActivity {
         ApiFacade facade = new ApiFacade(this);
         facade.searchAudio("Beatles", new SimpleResponseListener<List<Audio>>(){
             @Override
-            public void onResponse(List<Audio> response) {
+            public void onResponse(final List<Audio> response) {
                 super.onResponse(response);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        audioAdapter.addAll(response);
+                    }
+                });
+
             }
         });
     }

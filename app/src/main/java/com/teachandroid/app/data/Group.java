@@ -11,11 +11,11 @@ import com.google.gson.annotations.SerializedName;
  string
  */
 public class Group {
-    @SerializedName("gid")
+    @SerializedName("id")
      private  int gid;
     @SerializedName("name")
     private  String name;
-    @SerializedName("photo")
+    @SerializedName("photo_50")
     private String photo;
 
     public int getGid() {

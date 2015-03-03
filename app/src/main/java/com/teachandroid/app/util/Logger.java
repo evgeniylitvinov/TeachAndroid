@@ -6,7 +6,7 @@ public class Logger {
 
     private static final String TAG = "TeachAndroid";
 
-    public static void log(String tag, String format, Object... args){
-        Log.d(String.format("%s - %s", TAG, tag), String.format(format, args));
+    public static void log(String tag, String format){
+        Log.d(String.format("%s - %s", TAG, tag), format);
     }
 }

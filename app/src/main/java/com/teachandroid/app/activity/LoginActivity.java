@@ -87,7 +87,7 @@ public class LoginActivity extends Activity {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            Logger.log(TAG, "redirect url %s", url);
+            Logger.log(TAG, "redirect url " + url);
             if (pattern.matcher(url).matches()) {
                 if (url.indexOf("#") > 0) {
                     SessionStore.parseSession(url, LoginActivity.this);

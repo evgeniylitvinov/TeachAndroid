@@ -35,20 +35,20 @@ public class AudioActivity extends ActionBarActivity {
         audioList = (ListView) findViewById(R.id.list_audio);
 
         audioList.setAdapter(audioAdapter);
-
         ApiFacade facade = new ApiFacade(this);
-        facade.getAudio(new SimpleResponseListener<List<Audio>>(){
-            @Override
-            public void onResponse(final List<Audio> response) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        audioAdapter.addAll(response);
-                    }
-                });
-            }
-        });
-    }
+    facade.getAudio(new SimpleResponseListener<List<Audio>>(){
+        @Override
+        public void onResponse(final List<Audio> response) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    audioAdapter.addAll(response);
+                }
+            });
+
+        }
+    });
+}
 
 
     private static final class AudioAdapter extends ArrayAdapter<Audio>{

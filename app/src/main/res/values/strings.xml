@@ -10,5 +10,6 @@
     <string name="dialogs">Dialogs</string>
     <string name="audios">Audios</string>
     <string name="groups">Groups</string>
+    <string name="title_activity_video">VideoActivity</string>
 
 </resources>

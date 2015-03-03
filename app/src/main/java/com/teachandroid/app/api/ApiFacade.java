@@ -75,6 +75,7 @@ public class ApiFacade {
     public void getGroups(final ResponseListener<List<Group>> listener){
         RequestBuilder builder = new VkRequestBuilder("groups.get", accessToken);
         builder.addParam("count", "100");
+        builder.addParam("extended","1");
 
         String query = builder.query();
         Logger.log(TAG, "api request - %s", query);
@@ -87,6 +88,7 @@ public class ApiFacade {
                     HttpResponse response = httpClient.execute(request);
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    Logger.log(TAG,"json groups request-",response.getEntity().getContent().toString());
 
                     ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Group>>>() {
                     }.getType());

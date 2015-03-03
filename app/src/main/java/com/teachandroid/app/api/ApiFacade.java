@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -110,7 +111,7 @@ public class ApiFacade {
 
     }
 
-    public void searchAudio(final String audioKeyWord){
+    public void searchAudio(final String audioKeyWord, final ResponseListener<List<Audio>> listener){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -136,10 +137,23 @@ public class ApiFacade {
                     InputStream in = connection.getInputStream();
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    while ((line = reader.readLine()) != null){
-                        Logger.log(TAG, "url response " + line);
+                    String response = null;
+                    while ((response = reader.readLine()) != null){
+                        Logger.log(TAG, "url response " + response);
                     }
+
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<ApiResponse<ResponseList<Audio>>>() {
+                    }.getType();
+
+                    ApiResponse<ResponseList<Audio>> apiResponse = gson.fromJson(response, type);
+                    if(apiResponse != null){
+                        listener.onResponse(apiResponse.getResult().getItems());
+                        listener.onError(apiResponse.getError());
+                    }else {
+                        listener.onError(new Error());
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {

@@ -22,7 +22,8 @@
             android:text="@string/dialogs"/>
     <Button android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/groups"/>
+            android:text="@string/groups"
+            android:id="@+id/groups_button"/>
 
     <Button
             android:id="@+id/button_audio"

@@ -28,14 +28,6 @@ public class Video {
     @SerializedName("comments")
     private long comments;
 
-    public long getId() {
-        return id;
-    }
-
-    public long getOwner_id() {
-        return owner_id;
-    }
-
     @SerializedName("photo_130")
     private String photo_130;
 
@@ -50,4 +42,56 @@ public class Video {
 
     @SerializedName("player")
     private String player;
+
+    public long getId() {
+        return id;
+    }
+
+    public long getOwner_id() {
+        return owner_id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public long getComments() {
+        return comments;
+    }
+
+    public long getViews() {
+        return views;
+    }
+
+    public String getPhoto_130() {
+        return photo_130;
+    }
+
+    public String getPhoto_320() {
+        return photo_320;
+    }
+
+    public String getPhoto_640() {
+        return photo_640;
+    }
+
+    public long getAdding_date() {
+        return adding_date;
+    }
+
+    public String getPlayer() {
+        return player;
+    }
 }

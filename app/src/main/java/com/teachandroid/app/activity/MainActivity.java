@@ -31,5 +31,17 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, VideoActivity.class));
             }
         });
+        findViewById(R.id.button_photos).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PhotosActivity.class));
+            }
+        });
+        findViewById(R.id.button_friends).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FriendsActivity.class));
+            }
+        });
     }
 }

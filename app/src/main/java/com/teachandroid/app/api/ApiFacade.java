@@ -128,7 +128,92 @@ public class ApiFacade {
         }).start();
     }
 
+    public void getPhotos() throws UnsupportedEncodingException {
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
+                urlBuilder.append("photos.getProfile");
+                urlBuilder.append("?");
+                try {
+                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
+                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
+                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                HttpURLConnection connection = null;
+
+                try {
+                    String urlString = urlBuilder.toString();
+
+                    Logger.log(TAG, "запрос " + urlString);
+                    URL url = new URL(urlString);
+                    connection = (HttpURLConnection) url.openConnection();
+                    InputStream in = connection.getInputStream();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        Logger.log(TAG, "ответ " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+
+            }
+        }).start();
+    }
+
+
+    public void getFriends() throws UnsupportedEncodingException {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
+                urlBuilder.append("friends.get");
+                urlBuilder.append("?");
+                try {
+                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
+                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
+                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                HttpURLConnection connection = null;
+
+                try {
+                    String urlString = urlBuilder.toString();
+
+                    Logger.log(TAG, "запрос " + urlString);
+                    URL url = new URL(urlString);
+                    connection = (HttpURLConnection) url.openConnection();
+                    InputStream in = connection.getInputStream();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        Logger.log(TAG, "ответ " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+
+            }
+        }).start();
+    }
 
 
     public void getGroups(final ResponseListener<List<Group>> listener){
@@ -137,7 +222,7 @@ public class ApiFacade {
         builder.addParam("extended","1");
 
         String query = builder.query();
-        Logger.log(TAG, "api request - %s", query);
+        Logger.log(TAG, "api request - " + query);
 
         final HttpGet request = new HttpGet(query);
         requestExecutor.execute(new Runnable() {
@@ -148,7 +233,7 @@ public class ApiFacade {
 
                     //BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                     String responseString = EntityUtils.toString(response.getEntity());
-                    Logger.log(TAG,"json groups request " + responseString);
+                    Logger.log(TAG,"json groups request  " + responseString);
 
                     ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(responseString, new TypeToken<ApiResponse<ResponseList<Group>>>() {
                     }.getType());
@@ -165,6 +250,10 @@ public class ApiFacade {
         });
 
     }
+
+
+
+
 
     public void searchAudio(final String audioKeyWord, final ResponseListener<List<Audio>> listener){
         new Thread(new Runnable() {

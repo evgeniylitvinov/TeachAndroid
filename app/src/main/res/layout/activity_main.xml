@@ -6,7 +6,9 @@
                 android:padding="@dimen/activity_horizontal_margin"
                 tools:context=".MainActivity">
 
-    <Button android:layout_width="match_parent"
+    <Button
+            android:id="@+id/button_photos"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/photos"/>
     <Button
@@ -14,7 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/videos"/>
-    <Button android:layout_width="match_parent"
+    <Button
+            android:id="@+id/button_friends"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/friends"/>
     <Button android:layout_width="match_parent"

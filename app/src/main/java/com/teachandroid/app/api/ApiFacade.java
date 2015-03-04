@@ -1,14 +1,17 @@
 package com.teachandroid.app.api;
 
 import android.content.Context;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.teachandroid.app.api.reponse.*;
 import com.teachandroid.app.api.reponse.Error;
 import com.teachandroid.app.data.Audio;
 import com.teachandroid.app.data.Session;
+import com.teachandroid.app.data.Friend;
 import com.teachandroid.app.store.SessionStore;
 import com.teachandroid.app.util.Logger;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -41,7 +44,7 @@ public class ApiFacade {
         this.httpClient = HttpClientFactory.getThreadSafeClient();
     }
 
-    public void getAudio(final ResponseListener<List<Audio>> listener){
+    public void getAudio(final ResponseListener<List<Audio>> listener) {
         RequestBuilder builder = new VkRequestBuilder("audio.get", accessToken);
         builder.addParam("count", "100");
 
@@ -59,20 +62,54 @@ public class ApiFacade {
 
                     ApiResponse<ResponseList<Audio>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Audio>>>() {
                     }.getType());
-                    if(apiResponse != null){
+                    if (apiResponse != null) {
                         listener.onResponse(apiResponse.getResult().getItems());
                         listener.onError(apiResponse.getError());
-                    }else {
+                    } else {
                         listener.onError(new Error());
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
 
-    public void getUserAudio(String userId){
+    public void getUserAudio(String userId) {
 
     }
+
+    public void getFriends(final ResponseListener<List<Friend>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("friends.get", accessToken);
+        builder.addParam("count", "100");
+        builder.addParam("fields", "nickname,photo_200_orig,photo_100");
+        String query = builder.query();
+        Logger.log(TAG, "api request - %s", query);
+
+        final HttpGet request = new HttpGet(query);
+
+        requestExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpResponse response = httpClient.execute(request);
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                    ApiResponse<ResponseList<Friend>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Friend>>>() {
+                    }.getType());
+                    if (apiResponse != null) {
+                        listener.onResponse(apiResponse.getResult().getItems());
+                        listener.onError(apiResponse.getError());
+                    } else {
+                        listener.onError(new Error());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+
 }

@@ -11,5 +11,6 @@
     <string name="audios">Audios</string>
     <string name="groups">Groups</string>
     <string name="title_activity_friend">FriendActivity</string>
+    <string name="title_activity_groups">GroupsActivity</string>
 
 </resources>

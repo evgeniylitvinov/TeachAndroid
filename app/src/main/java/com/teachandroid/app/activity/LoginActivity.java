@@ -47,6 +47,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (!SessionStore.isValidSession(this)) {
             setContentView(R.layout.activity_login);
             loginWebView = (WebView) findViewById(R.id.web_view);

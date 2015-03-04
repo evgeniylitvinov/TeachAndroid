@@ -1,43 +1,44 @@
 package com.teachandroid.app.data;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.net.URI;
-
+/**
+ * Created by rakovskyi on 26.02.15.
+ *gid 	Community ID.
+ positive number
+ name 	Community name.
+ string
+ photo 	URL of the 50px-wide community logo.
+ string
+ */
 public class Group {
-
     @SerializedName("id")
-    private long id ;
-
+     private  int gid;
     @SerializedName("name")
-    private String name;
-
-    @SerializedName("screen_name")
-    private String screenName;
-
+    private  String name;
     @SerializedName("photo_50")
-    private String photo_50;
+    private String photo;
 
-    @SerializedName("photo_100")
-    private String photo_100;
+    public int getGid() {
+        return gid;
+    }
 
-    @SerializedName("photo_200")
-    private String photo_200;
-
-    public long getId() {
-        return id;
+    public void setGid(int gid) {
+        this.gid = gid;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getScreenName() {
-        return screenName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getPhoto_50() {
-        return photo_50;
+    public String getPhoto() {
+        return photo;
     }
 
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 }

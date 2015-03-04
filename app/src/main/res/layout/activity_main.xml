@@ -22,8 +22,11 @@
     <Button android:id="@+id/button_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/groups"/>
-    <Button android:id="@+id/button_audio"
+            android:text="@string/groups"
+            android:id="@+id/groups_button"/>
+
+    <Button
+            android:id="@+id/button_audio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/audios"/>
@@ -37,4 +40,3 @@
                 android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 </LinearLayout>
-

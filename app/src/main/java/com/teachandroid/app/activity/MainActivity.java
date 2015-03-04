@@ -26,10 +26,10 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, DialogActivity.class));
             }
         });
-        findViewById(R.id.button_group).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.groups_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, GroupActivity.class));
+                startActivity(new Intent(MainActivity.this, GroupsActivity.class));
             }
         });
         findViewById(R.id.button_relogin).setOnClickListener(new View.OnClickListener() {

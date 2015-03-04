@@ -122,38 +122,6 @@ public class ApiFacade {
         });
 
     }
-    public void getGroup(final ResponseListener<List<Group>> listener) {
-        RequestBuilder builder = new VkRequestBuilder("groups.get", accessToken);
-        builder.addParam("count", "100");
-        builder.addParam("extended", "1");
-
-        String query = builder.query();
-        Logger.log(TAG, "api request - %s", query);
-
-        final HttpGet request = new HttpGet(query);
-        requestExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse response = httpClient.execute(request);
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-                    ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Group>>>() {
-                    }.getType());
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-
-    }
     public void getDialog(final ResponseListener<List<Dialog>> listener) {
         RequestBuilder builder = new VkRequestBuilder("messages.getDialogs", accessToken);  //make request
         builder.addParam("count", "20");

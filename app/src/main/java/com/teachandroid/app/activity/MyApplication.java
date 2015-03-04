@@ -1,4 +1,4 @@
-package com.teachandroid.app.data;
+package com.teachandroid.app.activity;
 
 import android.app.Application;
 import android.content.Context;

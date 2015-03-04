@@ -1,8 +1,11 @@
 package com.teachandroid.app.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+public class User implements Parcelable{
 
     @SerializedName("id")
     private long id	;
@@ -13,8 +16,14 @@ public class User {
     @SerializedName("last_name")
     private String lastName;
 
-    //deactivated
+    @SerializedName("photo_50")
+    private String photo50;
 
+    @SerializedName("photo_100")
+    private String photo100;
+
+    @SerializedName("photo_200")
+    private String photo200;
 
     public User(long id) {
         this.id = id;
@@ -68,17 +77,39 @@ public class User {
         this.photo200 = photo200;
     }
 
-    //hidden: 1
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-    @SerializedName("photo_50")
-    private String photo50;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(firstName);
+        dest.writeString(lastName);
+        dest.writeString(photo50);
+        dest.writeString(photo100);
+        dest.writeString(photo200);
+    }
 
-    @SerializedName("photo_100")
-    private String photo100;
+    public User(Parcel parcel){
+        this.id = parcel.readLong();
+        this.firstName =parcel.readString();
+        this.lastName = parcel.readString();
+        this.photo50 = parcel.readString();
+        this.photo100 = parcel.readString();
+        this.photo200 = parcel.readString();
+    }
 
-    @SerializedName("photo_200")
-    private String photo200;
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
 
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
 
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
 

@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dialogs"/>
-    <Button android:id="@+id/button_group"
+    <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/groups"
@@ -30,13 +30,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/audios"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <Button android:id="@+id/button_relogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/relogin"
                 android:layout_alignParentBottom="true"/>
+
     </RelativeLayout>
 </LinearLayout>

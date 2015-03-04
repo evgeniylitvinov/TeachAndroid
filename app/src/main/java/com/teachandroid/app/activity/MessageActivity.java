@@ -1,7 +1,9 @@
 package com.teachandroid.app.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,20 +15,23 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.teachandroid.app.R;
-import com.teachandroid.app.api.ApiFacade;
-import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.KnownUsers;
 import com.teachandroid.app.data.Message;
 import com.teachandroid.app.data.User;
+import com.teachandroid.app.api.ApiFacadeService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MessageActivity extends ActionBarActivity {
 
     private MessageAdapter messageAdapter;
-
     private ListView  messageList;
+
+    private static String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
+    private MessageReceiver receiverMessage;
+    private UserReceiver receiverUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,22 +40,13 @@ public class MessageActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         if (intent == null) { return;  }
-        Message message = (Message) intent.getParcelableExtra(Message.EXTRA_MESSAGE);
+        Message message = intent.getParcelableExtra(Message.EXTRA_MESSAGE);
         messageAdapter = new MessageAdapter(this, new ArrayList<Message>());
         messageList = (ListView) findViewById(R.id.list_message);
         messageList.setAdapter(messageAdapter);
-        ApiFacade facade = new ApiFacade(this);
-        facade.getMessage( message, new SimpleResponseListener<List<Message>>() {
-            @Override
-            public void onResponse(final List<Message> response) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        messageAdapter.addAll(response);
-                    }
-                });
-            }
-        });
+
+        registerAllNeededReceiver();
+        fillAndStartService(message);
 
         ImageView imageView = (ImageView)findViewById(R.id.image_message_top);
         TextView textOwnerData = (TextView) findViewById(R.id.text_message_owner_data);
@@ -62,6 +58,12 @@ public class MessageActivity extends ActionBarActivity {
             ImageLoader.getInstance().displayImage(user.getPhoto200(),imageView);
             textOwnerData.setText(user.getFirstName() + " - " +user.getLastName());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unRegisterAllNeededReceiver();
+        super.onDestroy();
     }
 
     private static final class MessageAdapter extends ArrayAdapter<Message> {
@@ -90,4 +92,48 @@ public class MessageActivity extends ActionBarActivity {
             return convertView;
         }
     }
+
+    private void fillAndStartService(Message message) {
+
+        Intent intent = new Intent(this,ApiFacadeService.class);
+        intent.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND,"messages.getHistory");
+        HashMap<String,String> parameters = new HashMap<String, String>();
+        parameters.put("user_id", message.getUserIdString());
+        parameters.put("chat_id", message.getChatId());
+        intent.putExtra(ApiFacadeService.EXTRA_PARAMETERS,parameters);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE,BROADCAST_MESSAGE);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME,Message.class.getName());
+
+        startService(intent);
+    }
+
+    private void registerAllNeededReceiver() {
+        receiverMessage = new MessageReceiver();
+        registerReceiver(receiverMessage,new IntentFilter(BROADCAST_MESSAGE));
+        receiverUser = new UserReceiver();
+        registerReceiver(receiverUser,new IntentFilter(KnownUsers.BROADCAST_USER));
+    }
+
+    private void unRegisterAllNeededReceiver() {
+        unregisterReceiver(receiverMessage);
+        unregisterReceiver(receiverUser);
+    }
+
+    private class MessageReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null ) {return;}
+            ArrayList<Message> result;
+            result = intent.getParcelableArrayListExtra(BROADCAST_MESSAGE);
+            messageAdapter.addAll(result);
+            messageAdapter.notifyDataSetChanged();
+        }
+    }
+    private class UserReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            messageAdapter.notifyDataSetChanged();
+        }
+    }
+
 }

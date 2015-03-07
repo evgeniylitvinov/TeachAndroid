@@ -49,7 +49,7 @@ public class DialogActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(DialogActivity.this,MessageActivity.class);
                 Message message = ((Dialog)parent.getAdapter().getItem(position)).getMessage();
-                intent.putExtra(Message.EXTRA_MESSAGE,message);
+                intent.putExtra(MessageActivity.EXTRA_MESSAGE,message);
                 startActivity(intent);
             }
         });

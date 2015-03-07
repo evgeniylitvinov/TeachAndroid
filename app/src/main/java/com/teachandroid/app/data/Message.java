@@ -6,11 +6,10 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Message implements Parcelable{
-
-    public static String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 
     @SerializedName("id")
     private long id ;
@@ -53,6 +52,12 @@ public class Message implements Parcelable{
 
     @SerializedName("chat_id")
     private long chatId;
+
+    @SerializedName("chat_active")
+    private ArrayList<Long> chatActive;
+
+    @SerializedName("push_settings")
+    private String pushSettings;
 
     @SerializedName("users_count")
     private int usersCount;
@@ -113,6 +118,10 @@ public class Message implements Parcelable{
         return ""+chatId;
     }
 
+    public ArrayList<Long> getChatActive() {
+        return chatActive;
+    }
+
     public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
 
         public Message createFromParcel(Parcel in) {
@@ -143,6 +152,7 @@ public class Message implements Parcelable{
         dest.writeInt(important);
         dest.writeInt(deleted);
         dest.writeLong(chatId);
+        dest.writeList(chatActive);
         dest.writeInt(usersCount);
         dest.writeLong(adminId);
         dest.writeString(actionText);
@@ -164,6 +174,8 @@ public class Message implements Parcelable{
         this.important = parcel.readInt();
         this.deleted = parcel.readInt();
         this.chatId = parcel.readLong();
+        this.chatActive = new ArrayList<Long>();
+        parcel.readList(this.chatActive,chatActive.getClass().getClassLoader());
         this.usersCount = parcel.readInt();
         this.adminId = parcel.readLong();
         this.actionText = parcel.readString();

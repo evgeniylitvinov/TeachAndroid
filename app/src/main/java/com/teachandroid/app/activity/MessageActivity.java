@@ -10,15 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.teachandroid.app.R;
+import com.teachandroid.app.data.Dialog;
 import com.teachandroid.app.data.KnownUsers;
 import com.teachandroid.app.data.Message;
 import com.teachandroid.app.data.User;
 import com.teachandroid.app.api.ApiFacadeService;
+import com.teachandroid.app.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,35 +32,66 @@ public class MessageActivity extends ActionBarActivity {
 
     private MessageAdapter messageAdapter;
     private ListView  messageList;
+    private List<ImageView> imageViewList = new ArrayList<ImageView>();
 
+    public static String EXTRA_MESSAGE = "EXTRA_MESSAGE";
     private static String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
     private MessageReceiver receiverMessage;
     private UserReceiver receiverUser;
+    private Intent intent;
+    private Message message;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
-        Intent intent = getIntent();
+        intent = getIntent();
         if (intent == null) { return;  }
-        Message message = intent.getParcelableExtra(Message.EXTRA_MESSAGE);
+
+        message = intent.getParcelableExtra(MessageActivity.EXTRA_MESSAGE);
         messageAdapter = new MessageAdapter(this, new ArrayList<Message>());
         messageList = (ListView) findViewById(R.id.list_message);
         messageList.setAdapter(messageAdapter);
 
+        fillFieldOfActivity();
         registerAllNeededReceiver();
         fillAndStartService(message);
+    }
+
+    private void fillFieldOfActivity() {
+
 
         ImageView imageView = (ImageView)findViewById(R.id.image_message_top);
         TextView textOwnerData = (TextView) findViewById(R.id.text_message_owner_data);
         TextView textTitleData = (TextView) findViewById(R.id.text_message_title_data);
+        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.horizontal_linear_scroll);
+        List<Long> listChatUsers = message.getChatActive();
+
+        User user = KnownUsers.getInstance().getUserFromId(message.getUserId());
+        ImageLoader.getInstance().displayImage(user.getPhoto200(),imageView);
 
         textTitleData.setText(message.getTitle());
-        User user = KnownUsers.getInstance().getUserFromId(message.getUserId());
-        if (user!=null) {
-            ImageLoader.getInstance().displayImage(user.getPhoto200(),imageView);
-            textOwnerData.setText(user.getFirstName() + " - " +user.getLastName());
+        textOwnerData.setText(user.getFirstName() + " - " +user.getLastName());
+
+        for (final Long tempId :listChatUsers){
+
+            ImageView tempImageView = new ImageView(this);
+            linearLayout.addView(tempImageView);
+            tempImageView.setPadding(3, 1, 3, 1);
+            imageViewList.add(tempImageView);
+            tempImageView.setOnClickListener(new View.OnClickListener() {
+                private Long id = tempId;
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(),UserActivity.class);
+                    intent.putExtra(UserActivity.EXTRA_USER_ID,id);
+                    startActivity(intent);
+                }
+            });
+
+            ImageLoader.getInstance().displayImage(KnownUsers.getInstance().getUserFromId(tempId).getPhoto50(), imageViewList.get(imageViewList.size()-1));
         }
     }
 

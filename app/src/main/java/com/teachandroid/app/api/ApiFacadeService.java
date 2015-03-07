@@ -61,12 +61,20 @@ public class ApiFacadeService extends Service {
             obtainDataFromIntent(intent);
             final HttpGet request = makeRequest();
             requestExecutor.execute(new Runnable() {
+                String threadReturnBroadcastMessage  = returnedBroadcastMessage;
+                String threadTypeOfReturnedData = typeOfReturnedData.getSimpleName();
+
                 @Override
                 public void run() {
                     try {
                         HttpResponse response =  httpClient.execute(request);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                        sendResultData(reader);
+                        StringBuilder stringResponse = new StringBuilder();
+                        String tempString = null;
+                        while ((tempString=reader.readLine())!=null){
+                            stringResponse.append(tempString);
+                        }
+                        sendResultData(stringResponse.toString(),threadReturnBroadcastMessage, threadTypeOfReturnedData);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -104,26 +112,26 @@ public class ApiFacadeService extends Service {
         String query = builder.query();
         return new HttpGet(query);
     }
-    private void sendResultData(BufferedReader reader){
+    private void sendResultData(String request, String localReturnedBroadcastMessage, String localTypeOfReturnedData){
         Boolean haveResult= false;
-        Intent intent = new Intent(returnedBroadcastMessage);
-        if (typeOfReturnedData.getSimpleName().equals("Dialog")) {
-            ApiResponse<ResponseList<Dialog>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Dialog>>>() {}.getType());
-            if (apiResponse == null) {return;}
+        Intent intent = new Intent(localReturnedBroadcastMessage);
+        if (localTypeOfReturnedData.equals("Dialog")) {
+            ApiResponse<ResponseList<Dialog>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Dialog>>>() {}.getType());
+            if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Dialog> result = (ArrayList<Dialog>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (typeOfReturnedData.getSimpleName().equals("Message")) {
-            ApiResponse<ResponseList<Message>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Message>>>() { }.getType());
-            if (apiResponse == null) {return;}
+        if (localTypeOfReturnedData.equals("Message")) {
+            ApiResponse<ResponseList<Message>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Message>>>() { }.getType());
+            if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Message> result = (ArrayList<Message>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (typeOfReturnedData.getSimpleName().equals("User")) {
+        if (localTypeOfReturnedData.equals("User")) {
 
-            ApiResponse<ArrayList<User>> apiResponse = new Gson().fromJson(reader,new TypeToken<ApiResponse<ArrayList<User>>>(){}.getType());
+            ApiResponse<ArrayList<User>> apiResponse = new Gson().fromJson(request,new TypeToken<ApiResponse<ArrayList<User>>>(){}.getType());
             if(apiResponse != null && apiResponse.getResult()!=null){
                 for (User user :apiResponse.getResult()) {
                     User tempUser = new User(user.getId());
@@ -133,12 +141,12 @@ public class ApiFacadeService extends Service {
                     tempUser.setPhoto100(user.getPhoto100());
                     tempUser.setPhoto200(user.getPhoto200());
                     KnownUsers.getInstance().addUser(user.getId(), tempUser);
+                    ArrayList<User> result = (ArrayList<User>) apiResponse.getResult();
+                    intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
+                    haveResult = true;
                 }
             }else {
             }
-            ArrayList<User> result = (ArrayList<User>) apiResponse.getResult();
-            intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
-            haveResult = true;
         }
 
         if (haveResult){  sendBroadcast(intent); }

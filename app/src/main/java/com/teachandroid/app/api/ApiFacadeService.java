@@ -70,7 +70,7 @@ public class ApiFacadeService extends Service {
                         HttpResponse response =  httpClient.execute(request);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                         StringBuilder stringResponse = new StringBuilder();
-                        String tempString = null;
+                        String tempString;
                         while ((tempString=reader.readLine())!=null){
                             stringResponse.append(tempString);
                         }
@@ -140,7 +140,7 @@ public class ApiFacadeService extends Service {
                     tempUser.setPhoto100(user.getPhoto100());
                     tempUser.setPhoto200(user.getPhoto200());
                     KnownUsers.getInstance().addUser(user.getId(), tempUser);
-                    ArrayList<User> result = (ArrayList<User>) apiResponse.getResult();
+                    ArrayList<User> result = apiResponse.getResult();
                     intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
                     haveResult = true;
                 }

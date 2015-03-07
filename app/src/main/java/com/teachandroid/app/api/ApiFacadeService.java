@@ -105,7 +105,6 @@ public class ApiFacadeService extends Service {
     private HttpGet makeRequest(){
 
         RequestBuilder builder = new VkRequestBuilder(mainCommandForRequest, accessToken);  //make request
-        parametersForRequest.keySet();
         for (String hm :parametersForRequest.keySet()) {
             builder.addParam(hm,parametersForRequest.get(hm));
         }

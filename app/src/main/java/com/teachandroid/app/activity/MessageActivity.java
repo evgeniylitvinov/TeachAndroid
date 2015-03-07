@@ -31,13 +31,16 @@ import java.util.List;
 public class MessageActivity extends ActionBarActivity {
 
     private MessageAdapter messageAdapter;
+    private LinearLayout chatUsersLinearLayout;
     private ListView  messageList;
     private List<ImageView> imageViewList = new ArrayList<ImageView>();
 
     public static String EXTRA_MESSAGE = "EXTRA_MESSAGE";
     private static String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
+    private static String BROADCAST_CHAT_USERS = "BROADCAST_CHAT_USERS";
     private MessageReceiver receiverMessage;
     private UserReceiver receiverUser;
+    private ChatUsersReceiver receiverChatUsers;
     private Intent intent;
     private Message message;
 
@@ -66,33 +69,13 @@ public class MessageActivity extends ActionBarActivity {
         ImageView imageView = (ImageView)findViewById(R.id.image_message_top);
         TextView textOwnerData = (TextView) findViewById(R.id.text_message_owner_data);
         TextView textTitleData = (TextView) findViewById(R.id.text_message_title_data);
-        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.horizontal_linear_scroll);
-        List<Long> listChatUsers = message.getChatActive();
+        chatUsersLinearLayout = (LinearLayout)findViewById(R.id.horizontal_linear_scroll);
 
         User user = KnownUsers.getInstance().getUserFromId(message.getUserId());
         ImageLoader.getInstance().displayImage(user.getPhoto200(),imageView);
 
         textTitleData.setText(message.getTitle());
         textOwnerData.setText(user.getFirstName() + " - " +user.getLastName());
-
-        for (final Long tempId :listChatUsers){
-
-            ImageView tempImageView = new ImageView(this);
-            linearLayout.addView(tempImageView);
-            tempImageView.setPadding(3, 1, 3, 1);
-            imageViewList.add(tempImageView);
-            tempImageView.setOnClickListener(new View.OnClickListener() {
-                private Long id = tempId;
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(),UserActivity.class);
-                    intent.putExtra(UserActivity.EXTRA_USER_ID,id);
-                    startActivity(intent);
-                }
-            });
-
-            ImageLoader.getInstance().displayImage(KnownUsers.getInstance().getUserFromId(tempId).getPhoto50(), imageViewList.get(imageViewList.size()-1));
-        }
     }
 
     @Override
@@ -130,16 +113,33 @@ public class MessageActivity extends ActionBarActivity {
 
     private void fillAndStartService(Message message) {
 
-        Intent intent = new Intent(this,ApiFacadeService.class);
-        intent.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND,"messages.getHistory");
-        HashMap<String,String> parameters = new HashMap<String, String>();
-        parameters.put("user_id", message.getUserIdString());
-        parameters.put("chat_id", message.getChatId());
-        intent.putExtra(ApiFacadeService.EXTRA_PARAMETERS,parameters);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE,BROADCAST_MESSAGE);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME,Message.class.getName());
+        if (message.getChatId()==0) {
+            Intent intentForGetHistory = new Intent(this, ApiFacadeService.class);
+            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.getHistory");
+            HashMap<String, String> parametersForGetHistory = new HashMap<String, String>();
+            parametersForGetHistory.put("user_id", message.getUserIdString());
+            parametersForGetHistory.put("chat_id", ""+message.getChatId());
+            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parametersForGetHistory);
+            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, BROADCAST_MESSAGE);
+            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, Message.class.getName());
 
-        startService(intent);
+            startService(intentForGetHistory);
+        } else {
+
+            Intent intentForChatUsers = new Intent(this, ApiFacadeService.class);
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.getChatUsers");
+            HashMap<String, String> parametersForChatUsers = new HashMap<String, String>();
+            parametersForChatUsers.put("chat_id", ""+message.getChatId());
+            parametersForChatUsers.put("fields", "photo_50,photo_100,photo_200");
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parametersForChatUsers);
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, BROADCAST_CHAT_USERS);
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, User.class.getName());
+
+            startService(intentForChatUsers);
+        }
+
+
+
     }
 
     private void registerAllNeededReceiver() {
@@ -147,11 +147,14 @@ public class MessageActivity extends ActionBarActivity {
         registerReceiver(receiverMessage,new IntentFilter(BROADCAST_MESSAGE));
         receiverUser = new UserReceiver();
         registerReceiver(receiverUser,new IntentFilter(KnownUsers.BROADCAST_USER));
+        receiverChatUsers = new ChatUsersReceiver();
+        registerReceiver(receiverChatUsers,new IntentFilter(BROADCAST_CHAT_USERS));
     }
 
     private void unRegisterAllNeededReceiver() {
         unregisterReceiver(receiverMessage);
         unregisterReceiver(receiverUser);
+        unregisterReceiver(receiverChatUsers);
     }
 
     private class MessageReceiver extends BroadcastReceiver {
@@ -168,6 +171,30 @@ public class MessageActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             messageAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private class ChatUsersReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null ) {return;}
+            List<Long> listChatUsers = message.getChatActive();
+            for (final Long tempId :listChatUsers){
+                ImageView tempImageView = new ImageView(chatUsersLinearLayout.getContext());
+                chatUsersLinearLayout.addView(tempImageView);
+                tempImageView.setPadding(3, 1, 3, 1);
+                imageViewList.add(tempImageView);
+                tempImageView.setOnClickListener(new View.OnClickListener() {
+                    private Long id = tempId;
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(v.getContext(),UserActivity.class);
+                        intent.putExtra(UserActivity.EXTRA_USER_ID,id);
+                        startActivity(intent);
+                    }
+                });
+                ImageLoader.getInstance().displayImage(KnownUsers.getInstance().getUserFromId(tempId).getPhoto100(), imageViewList.get(imageViewList.size()-1));
+            }
         }
     }
 

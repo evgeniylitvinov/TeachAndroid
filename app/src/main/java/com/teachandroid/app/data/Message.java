@@ -114,8 +114,8 @@ public class Message implements Parcelable{
         return photo200;
     }
 
-    public String getChatId(){
-        return ""+chatId;
+    public Long getChatId(){
+        return chatId;
     }
 
     public ArrayList<Long> getChatActive() {

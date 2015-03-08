@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import com.teachandroid.app.R;
 
 public class MainActivity extends Activity {
@@ -30,6 +31,14 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, GroupsActivity.class));
+            }
+        });
+
+
+        findViewById(R.id.button_friend).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PhotoActivity.class));
             }
         });
     }

@@ -1,11 +1,14 @@
 package com.teachandroid.app.activity;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,39 +21,41 @@ import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.Friend;
+import com.teachandroid.app.data.Photo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendActivity extends ActionBarActivity {
+public class PhotoActivity extends ActionBarActivity {
 
-    private FriendAdapter friendAdapter;
+    private PhotoAdapter photoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend);
+        setContentView(R.layout.activity_photo);
         imageLoaderInit(getApplication());
 
-        ListView friendList;
-        friendAdapter = new FriendAdapter(this, new ArrayList<Friend>());
-        friendList = (ListView) findViewById(R.id.friend_listview);
-        friendList.setAdapter(friendAdapter);
+        GridView photoGrid;
+        photoAdapter = new PhotoAdapter(this, new ArrayList<Photo>());
+        photoGrid = (GridView) findViewById(R.id.photo_view);
+        photoGrid.setAdapter(photoAdapter);
 
         ApiFacade facade = new ApiFacade(this);
 
-        facade.getFriends(new SimpleResponseListener<List<Friend>>() {
+        facade.getPhotoAll(new SimpleResponseListener<List<Photo>>() {
             @Override
-            public void onResponse(final List<Friend> response) {
+            public void onResponse(final List<Photo> response) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        friendAdapter.addAll(response);
-            }
-        });
+                        photoAdapter.addAll(response);
+                    }
+                });
             }
         });
     }
+
 
     private void imageLoaderInit(Context context) {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
@@ -66,29 +71,24 @@ public class FriendActivity extends ActionBarActivity {
     }
 
 
-    public static final class FriendAdapter extends ArrayAdapter<Friend> {
+    public static final class PhotoAdapter extends ArrayAdapter<Photo> {
 
-        public FriendAdapter(Context context, List<Friend> objects) {
+        public PhotoAdapter(Context context, List<Photo> objects) {
             super(context, 0, objects);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = View.inflate(getContext(), R.layout.list_item_friend, null);
+                convertView = View.inflate(getContext(), R.layout.grid_item_photo, null);
             }
 
-            ImageView image100 = (ImageView) convertView.findViewById(R.id.imageview_image100);
-            TextView idView = (TextView) convertView.findViewById(R.id.text_user_id);
-            TextView firstNameView = (TextView) convertView.findViewById(R.id.text_user_first_name);
-            TextView lastNameView = (TextView) convertView.findViewById(R.id.text_user_last_name);
+            ImageView image100 = (ImageView) convertView.findViewById(R.id.imageviewPhoto);
 
-            Friend friend = getItem(position);
 
-            ImageLoader.getInstance().displayImage(friend.getPhoto100(), image100);
-            idView.setText(Long.toString(friend.getUserId()));
-            firstNameView.setText(friend.getFirstName());
-            lastNameView.setText(friend.getLastName());
+            Photo photo = getItem(position);
+
+            ImageLoader.getInstance().displayImage(photo.getPhoto100(), image100);
 
             return convertView;
         }

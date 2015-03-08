@@ -35,6 +35,7 @@ public class GroupsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
+
         groupAdapter = new GroupAdapter(this, new ArrayList<Group>());
 
         groupList = (ListView) findViewById(R.id.groups_list);

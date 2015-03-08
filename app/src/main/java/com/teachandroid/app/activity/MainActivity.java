@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
         });
 
 
-        findViewById(R.id.button_friend).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, PhotoActivity.class));

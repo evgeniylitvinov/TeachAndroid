@@ -21,6 +21,7 @@ import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.Friend;
+import com.teachandroid.app.data.Group;
 import com.teachandroid.app.data.Photo;
 
 import java.util.ArrayList;
@@ -34,16 +35,28 @@ public class PhotoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
-        imageLoaderInit(getApplication());
+        //imageLoaderInit(getApplication());
 
-        GridView photoGrid;
+
         photoAdapter = new PhotoAdapter(this, new ArrayList<Photo>());
-        photoGrid = (GridView) findViewById(R.id.photo_view);
+        GridView photoGrid = (GridView) findViewById(R.id.photo_view);
         photoGrid.setAdapter(photoAdapter);
 
         ApiFacade facade = new ApiFacade(this);
 
-        facade.getPhotoAll(new SimpleResponseListener<List<Photo>>() {
+     /*   facade.getPhotoAll(new SimpleResponseListener<List<Photo>>() {
+            @Override
+            public void onResponse(final List<Photo> response) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        photoAdapter.addAll(response);
+                    }
+                });
+            }
+        });
+*/
+        facade.getPhoto(new SimpleResponseListener<List<Photo>>() {
             @Override
             public void onResponse(final List<Photo> response) {
                 runOnUiThread(new Runnable() {
@@ -57,21 +70,7 @@ public class PhotoActivity extends ActionBarActivity {
     }
 
 
-    private void imageLoaderInit(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .denyCacheImageMultipleSizesInMemory()
-                .diskCacheFileNameGenerator(new Md5FileNameGenerator())
-                .diskCacheSize(50 * 1024 * 1024) // 50 Mb
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .writeDebugLogs() // Remove for release app
-                .build();
-
-        ImageLoader.getInstance().init(config);
-    }
-
-
-    public static final class PhotoAdapter extends ArrayAdapter<Photo> {
+    final class PhotoAdapter extends ArrayAdapter<Photo> {
 
         public PhotoAdapter(Context context, List<Photo> objects) {
             super(context, 0, objects);
@@ -88,7 +87,7 @@ public class PhotoActivity extends ActionBarActivity {
 
             Photo photo = getItem(position);
 
-            ImageLoader.getInstance().displayImage(photo.getPhoto100(), image100);
+            ImageLoader.getInstance().displayImage(photo.getPhoto200Orig(), image100);
 
             return convertView;
         }

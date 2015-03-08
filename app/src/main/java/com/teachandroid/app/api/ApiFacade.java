@@ -209,7 +209,46 @@ public class ApiFacade {
     }
 
 
-    public void getPhotoAll(final ResponseListener<List<Photo>> listener) {
+    public void getPhoto(final ResponseListener<List<Photo>> listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
+                urlBuilder.append("photos.getProfile");
+                urlBuilder.append("?");
+                try {
+                    urlBuilder.append("owner_id").append("=").append(URLEncoder.encode(userId, "UTF-8")).append("&");
+                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
+                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
+                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                HttpURLConnection connection = null;
+                try {
+                    String urlString = urlBuilder.toString();
+
+                    Logger.log(TAG, "ФОТО ЗАПРОС " + urlString);
+                    URL url = new URL(urlString);
+                    connection = (HttpURLConnection) url.openConnection();
+                    InputStream in = connection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        Logger.log(TAG, "ФОТО ОТВЕТ " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }
+        }).start();
+    }
+
+ /*   public void getPhotoAll(final ResponseListener<List<Photo>> listener) {
         RequestBuilder builder = new VkRequestBuilder("photos.getAll", accessToken);
 
         builder.addParam("count", "100");
@@ -239,6 +278,6 @@ public class ApiFacade {
                 }
             }
         });
-    }
+    }*/
 
 }

@@ -219,7 +219,7 @@ public class ApiFacade {
                 try {
                     urlBuilder.append("owner_id").append("=").append(URLEncoder.encode(userId, "UTF-8")).append("&");
                     urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
+
                     urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -236,7 +236,18 @@ public class ApiFacade {
                     String line = null;
                     while ((line = reader.readLine()) != null) {
                         Logger.log(TAG, "ФОТО ОТВЕТ " + line);
+
                     }
+                    //***---
+                    ApiResponse<ResponseList<Photo>> apiResponse = new Gson().fromJson(line, new TypeToken<ApiResponse<ResponseList<Photo>>>() {
+                    }.getType());
+                    if (apiResponse != null) {
+                        listener.onResponse(apiResponse.getResult().getItems());
+                        listener.onError(apiResponse.getError());
+                    } else {
+                        listener.onError(new Error());
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {

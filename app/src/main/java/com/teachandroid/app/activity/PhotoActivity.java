@@ -44,18 +44,7 @@ public class PhotoActivity extends ActionBarActivity {
 
         ApiFacade facade = new ApiFacade(this);
 
-     /*   facade.getPhotoAll(new SimpleResponseListener<List<Photo>>() {
-            @Override
-            public void onResponse(final List<Photo> response) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        photoAdapter.addAll(response);
-                    }
-                });
-            }
-        });
-*/
+
         facade.getPhoto(new SimpleResponseListener<List<Photo>>() {
             @Override
             public void onResponse(final List<Photo> response) {

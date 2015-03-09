@@ -234,8 +234,22 @@ public class ApiFacade {
                     InputStream in = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     String line = null;
+                    StringBuilder response = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
                         Logger.log(TAG, "ФОТО ОТВЕТ " + line);
+                        response.append(line);
+                    }
+
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<ApiResponse<ResponseList<Photo>>>() {
+                    }.getType();
+
+                    ApiResponse<ResponseList<Photo>> apiResponse = gson.fromJson(response.toString(), type);
+                    if (apiResponse != null) {
+                        listener.onResponse(apiResponse.getResult().getItems());
+                        listener.onError(apiResponse.getError());
+                    } else {
+                        listener.onError(new Error());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

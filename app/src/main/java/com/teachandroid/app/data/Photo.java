@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 public class Photo {
 
     @SerializedName("id")
-    private long Id;
+    private long id;
 
     @SerializedName("photo_200_orig")
     private String photo200Orig;
@@ -14,50 +14,52 @@ public class Photo {
     @SerializedName("photo_100")
     private String photo100;
 
-
     @SerializedName("album_id")
-    private String album_id;
+    private long albumId;
 
     @SerializedName("owner_id")
-    private String owner_id;
+    private long ownerId;
 
     @SerializedName("photo_75")
-    private String photo_75;
+    private String photo75;
 
     @SerializedName("photo_130")
-    private String photo_130;
+    private String photo130;
 
     @SerializedName("photo_604")
-    private String photo_604;
+    private String photo604;
 
     @SerializedName("photo_807")
-    private String photo_807;
+    private String photo807;
 
     @SerializedName("photo_1280")
-    private String photo_1280;
+    private String photo1280;
 
     @SerializedName("photo_2560")
-    private String photo_2560;
+    private String photo2560;
 
     @SerializedName("width")
     private int width;
 
     @SerializedName("height")
     private int height;
+
     @SerializedName("text")
-    private int text;
+    private String text;
+
     @SerializedName("date")
-    private int date;
+    private long date;
+
     @SerializedName("post_id")
-    private int post_id;
+    private long postId;
 
 
     public long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getPhoto200Orig() {
@@ -76,68 +78,68 @@ public class Photo {
         this.photo100 = photo100;
     }
 
-    public String getAlbum_id() {
-        return album_id;
+    public long getAlbumId() {
+        return albumId;
     }
 
-    public void setAlbum_id(String album_id) {
-        this.album_id = album_id;
+    public void setAlbumId(long albumId) {
+        this.albumId = albumId;
     }
 
-    public String getOwner_id() {
-        return owner_id;
+    public long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner_id(String owner_id) {
-        this.owner_id = owner_id;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
-    public String getPhoto_75() {
-        return photo_75;
+    public String getPhoto75() {
+        return photo75;
     }
 
-    public void setPhoto_75(String photo_75) {
-        this.photo_75 = photo_75;
+    public void setPhoto75(String photo75) {
+        this.photo75 = photo75;
     }
 
-    public String getPhoto_130() {
-        return photo_130;
+    public String getPhoto130() {
+        return photo130;
     }
 
-    public void setPhoto_130(String photo_130) {
-        this.photo_130 = photo_130;
+    public void setPhoto130(String photo130) {
+        this.photo130 = photo130;
     }
 
-    public String getPhoto_604() {
-        return photo_604;
+    public String getPhoto604() {
+        return photo604;
     }
 
-    public void setPhoto_604(String photo_604) {
-        this.photo_604 = photo_604;
+    public void setPhoto604(String photo604) {
+        this.photo604 = photo604;
     }
 
-    public String getPhoto_807() {
-        return photo_807;
+    public String getPhoto807() {
+        return photo807;
     }
 
-    public void setPhoto_807(String photo_807) {
-        this.photo_807 = photo_807;
+    public void setPhoto807(String photo807) {
+        this.photo807 = photo807;
     }
 
-    public String getPhoto_1280() {
-        return photo_1280;
+    public String getPhoto1280() {
+        return photo1280;
     }
 
-    public void setPhoto_1280(String photo_1280) {
-        this.photo_1280 = photo_1280;
+    public void setPhoto1280(String photo1280) {
+        this.photo1280 = photo1280;
     }
 
-    public String getPhoto_2560() {
-        return photo_2560;
+    public String getPhoto2560() {
+        return photo2560;
     }
 
-    public void setPhoto_2560(String photo_2560) {
-        this.photo_2560 = photo_2560;
+    public void setPhoto2560(String photo2560) {
+        this.photo2560 = photo2560;
     }
 
     public int getWidth() {
@@ -156,27 +158,27 @@ public class Photo {
         this.height = height;
     }
 
-    public int getText() {
+    public String getText() {
         return text;
     }
 
-    public void setText(int text) {
+    public void setText(String text) {
         this.text = text;
     }
 
-    public int getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(int date) {
+    public void setDate(long date) {
         this.date = date;
     }
 
-    public int getPost_id() {
-        return post_id;
+    public long getPostId() {
+        return postId;
     }
 
-    public void setPost_id(int post_id) {
-        this.post_id = post_id;
+    public void setPostId(long postId) {
+        this.postId = postId;
     }
 }

@@ -44,18 +44,6 @@ public class PhotoActivity extends ActionBarActivity {
 
         ApiFacade facade = new ApiFacade(this);
 
-     /*   facade.getPhotoAll(new SimpleResponseListener<List<Photo>>() {
-            @Override
-            public void onResponse(final List<Photo> response) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        photoAdapter.addAll(response);
-                    }
-                });
-            }
-        });
-*/
         facade.getPhoto(new SimpleResponseListener<List<Photo>>() {
             @Override
             public void onResponse(final List<Photo> response) {
@@ -87,7 +75,7 @@ public class PhotoActivity extends ActionBarActivity {
 
             Photo photo = getItem(position);
 
-            ImageLoader.getInstance().displayImage(photo.getPhoto200Orig(), image100);
+            ImageLoader.getInstance().displayImage(photo.getPhoto75(), image100);
 
             return convertView;
         }

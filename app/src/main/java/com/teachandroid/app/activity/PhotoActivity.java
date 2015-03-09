@@ -44,6 +44,7 @@ public class PhotoActivity extends ActionBarActivity {
 
         ApiFacade facade = new ApiFacade(this);
 
+
         facade.getPhoto(new SimpleResponseListener<List<Photo>>() {
             @Override
             public void onResponse(final List<Photo> response) {

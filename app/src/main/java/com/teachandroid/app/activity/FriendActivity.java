@@ -18,6 +18,7 @@ import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.Friend;
+import com.teachandroid.app.data.Video;
 
 import java.util.ArrayList;
 import java.util.List;

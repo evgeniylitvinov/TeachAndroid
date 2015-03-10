@@ -1,53 +1,80 @@
 package com.teachandroid.app.activity;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
-import com.teachandroid.app.data.Audio;
+import com.teachandroid.app.data.Group;
+import com.teachandroid.app.data.Video;
 
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VideoActivity extends ActionBarActivity {
 
+    private VideoAdapter videoAdapter;
+
+    private ListView videoList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
+        videoAdapter = new VideoAdapter(this, new ArrayList<Video>());
+
+        videoList = (ListView) findViewById(R.id.video_list);
+
+        videoList.setAdapter(videoAdapter);
+
         ApiFacade facade = new ApiFacade(this);
-        try {
-            facade.getVideoVK();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        facade.getVideo(new SimpleResponseListener<List<Video>>(){
+            @Override
+            public void onResponse(final List<Video> response) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        videoAdapter.addAll(response);
+                    }
+                });
+            }
+        });
+    }
+    private final class VideoAdapter extends ArrayAdapter<Video> {
+
+        public VideoAdapter(Context context, List<Video> objects) {
+            super(context, 0, objects);
         }
 
-    }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if(convertView == null){
+                convertView = View.inflate(getContext(), R.layout.video_list, null);
+            }
+            TextView titleView = (TextView) convertView.findViewById(R.id.text_video);
+            ImageView artistView = (ImageView) convertView.findViewById(R.id.photo_video);
+
+            Video item = getItem(position);
+
+            titleView.setText(item.getTitle());
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_video, menu);
-        return true;
-    }
+            ImageLoader.getInstance().displayImage(item.getPhoto_130(), artistView);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            return convertView;
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
+
+
+
 }

@@ -2,10 +2,7 @@ package com.teachandroid.app.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -14,16 +11,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
-import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
-import com.teachandroid.app.data.Audio;
 import com.teachandroid.app.data.Group;
+import com.teachandroid.app.data.Video;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.button_friend).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_friends).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, FriendActivity.class));
@@ -44,11 +44,6 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, PhotosActivity.class));
             }
         });
-        findViewById(R.id.button_friends).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FriendsActivity.class));
-            }
-        });
+
     }
 }

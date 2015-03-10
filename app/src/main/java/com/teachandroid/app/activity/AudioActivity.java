@@ -3,8 +3,6 @@ package com.teachandroid.app.activity;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -14,6 +12,7 @@ import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.Audio;
+import com.teachandroid.app.data.Video;
 
 import java.util.ArrayList;
 import java.util.List;

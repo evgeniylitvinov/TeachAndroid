@@ -1,7 +1,7 @@
 package com.teachandroid.app.activity;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
@@ -20,59 +21,60 @@ import com.teachandroid.app.data.Video;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupsActivity extends Activity {
-    private GroupAdapter groupAdapter;
+public class VideoActivity extends ActionBarActivity {
 
-    private ListView groupList;
+    private VideoAdapter videoAdapter;
+
+    private ListView videoList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_groups);
+        setContentView(R.layout.activity_video);
+        videoAdapter = new VideoAdapter(this, new ArrayList<Video>());
 
-        groupAdapter = new GroupAdapter(this, new ArrayList<Group>());
+        videoList = (ListView) findViewById(R.id.video_list);
 
-        groupList = (ListView) findViewById(R.id.groups_list);
-
-        groupList.setAdapter(groupAdapter);
+        videoList.setAdapter(videoAdapter);
 
         ApiFacade facade = new ApiFacade(this);
-        facade.getGroups(new SimpleResponseListener<List<Group>>(){
+        facade.getVideo(new SimpleResponseListener<List<Video>>(){
             @Override
-            public void onResponse(final List<Group> response) {
+            public void onResponse(final List<Video> response) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        groupAdapter.addAll(response);
+                        videoAdapter.addAll(response);
                     }
                 });
             }
         });
     }
-    private final class GroupAdapter extends ArrayAdapter<Group> {
+    private final class VideoAdapter extends ArrayAdapter<Video> {
 
-        public GroupAdapter(Context context, List<Group> objects) {
+        public VideoAdapter(Context context, List<Video> objects) {
             super(context, 0, objects);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView == null){
-                convertView = View.inflate(getContext(), R.layout.groups_list, null);
+                convertView = View.inflate(getContext(), R.layout.video_list, null);
             }
-            TextView titleView = (TextView) convertView.findViewById(R.id.text_group);
-            ImageView artistView = (ImageView) convertView.findViewById(R.id.photo_group);
+            TextView titleView = (TextView) convertView.findViewById(R.id.text_video);
+            ImageView artistView = (ImageView) convertView.findViewById(R.id.photo_video);
 
-            Group item = getItem(position);
+            Video item = getItem(position);
 
-            titleView.setText(item.getName());
+            titleView.setText(item.getTitle());
 
-           // ImageSize targetSize = new ImageSize(80, 50);
 
-            ImageLoader.getInstance().displayImage(item.getPhoto(),artistView);
-            //artistView.setText(item.getArtist());
+            ImageLoader.getInstance().displayImage(item.getPhoto_130(), artistView);
+
             return convertView;
         }
     }
+
+
 
 
 }

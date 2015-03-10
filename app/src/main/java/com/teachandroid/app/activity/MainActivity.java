@@ -55,5 +55,11 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
             }
         });
+        findViewById(R.id.button_video).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, VideoActivity.class));
+            }
+        });
     }
 }

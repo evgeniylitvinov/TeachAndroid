@@ -43,10 +43,11 @@
         </activity>
         <activity
             android:name=".activity.PhotoActivity"
-            android:label="@string/title_activity_photo">
-
+            android:label="@string/title_activity_photo"></activity>
+        <activity
+            android:name=".activity.VideoActivity"
+            android:label="@string/title_activity_video" >
         </activity>
-
 
         <service
             android:name=".api.ApiFacadeService"

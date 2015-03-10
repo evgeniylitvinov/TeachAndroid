@@ -46,8 +46,8 @@ public class FriendActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         friendAdapter.addAll(response);
-                    }
-                });
+            }
+        });
             }
         });
     }

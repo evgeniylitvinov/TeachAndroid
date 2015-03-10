@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import com.teachandroid.app.R;
 import com.teachandroid.app.store.SessionStore;
 
@@ -37,6 +38,14 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, GroupsActivity.class));
+            }
+        });
+
+
+        findViewById(R.id.button_photo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PhotoActivity.class));
             }
         });
         findViewById(R.id.button_relogin).setOnClickListener(new View.OnClickListener() {

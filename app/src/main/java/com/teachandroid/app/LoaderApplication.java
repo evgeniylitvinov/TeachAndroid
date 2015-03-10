@@ -14,6 +14,7 @@ import java.io.File;
 public class LoaderApplication extends Application {
     @Override
     public void onCreate(){
+        super.onCreate();
         File cacheDir = StorageUtils.getCacheDirectory(this.getApplicationContext());
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this.getApplicationContext()).writeDebugLogs().build();
         ImageLoader.getInstance().init(config);

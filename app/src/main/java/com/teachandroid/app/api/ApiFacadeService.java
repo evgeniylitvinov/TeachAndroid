@@ -6,7 +6,7 @@ import android.os.IBinder;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.teachandroid.app.activity.MyApplication;
+import com.teachandroid.app.LoaderApplication;
 import com.teachandroid.app.api.reponse.*;
 import com.teachandroid.app.data.Dialog;
 import com.teachandroid.app.data.KnownUsers;
@@ -51,7 +51,7 @@ public class ApiFacadeService extends Service {
     private String typeOfReturnedData;
 
     public ApiFacadeService() {
-        Session session = SessionStore.restore(MyApplication.getContext());
+        Session session = SessionStore.restore(LoaderApplication.getContext());
         this.accessToken = session.getAccessToken();
         this.userId = session.getUserId();
         this.httpClient = HttpClientFactory.getThreadSafeClient();

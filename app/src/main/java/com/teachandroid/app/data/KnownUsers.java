@@ -2,6 +2,7 @@ package com.teachandroid.app.data;
 
 import android.content.Intent;
 
+import com.teachandroid.app.LoaderApplication;
 import com.teachandroid.app.activity.MyApplication;
 import com.teachandroid.app.api.ApiFacadeService;
 
@@ -38,7 +39,7 @@ public class KnownUsers {
         if (returnUser==null){
             returnUser = knownUsers.get(1L);
 
-            Intent intentForChatUsers = new Intent(MyApplication.getContext(), ApiFacadeService.class);
+            Intent intentForChatUsers = new Intent(LoaderApplication.getContext(), ApiFacadeService.class);
             intentForChatUsers.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "users.get");
             HashMap<String, String> parameters = new HashMap<String, String>();
             parameters.put("user_ids", ""+id);
@@ -47,7 +48,7 @@ public class KnownUsers {
             intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, KnownUsers.BROADCAST_USER);
             intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, User.RETURNED_TYPE_USER);
 
-            MyApplication.getContext().startService(intentForChatUsers);
+            LoaderApplication.getContext().startService(intentForChatUsers);
 
         }
         return returnUser;

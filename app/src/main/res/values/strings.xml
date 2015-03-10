@@ -15,5 +15,6 @@
     <string name="title_activity_video">VideoActivity</string>
     <string name="title_activity_photos">PhotosActivity</string>
     <string name="title_activity_friends">FriendsActivity</string>
+    <string name="title_activity_photo">PhotoActivity</string>
 
 </resources>

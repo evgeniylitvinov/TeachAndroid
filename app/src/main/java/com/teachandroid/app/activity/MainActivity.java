@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import com.teachandroid.app.R;
 
 public class MainActivity extends Activity {
@@ -20,7 +21,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.button_friends).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_friend).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, FriendActivity.class));
@@ -32,18 +33,19 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, GroupsActivity.class));
             }
         });
+
+
+        findViewById(R.id.button_photo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PhotoActivity.class));
+            }
+        });
         findViewById(R.id.button_video).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, VideoActivity.class));
             }
         });
-        findViewById(R.id.button_photos).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PhotosActivity.class));
-            }
-        });
-
     }
 }

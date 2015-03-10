@@ -11,6 +11,11 @@ import java.util.List;
 
 public class Message implements Parcelable{
 
+    public  static String RETURNED_TYPE_MESSAGE = "MESSAGE";
+    public static String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
+    public static String BROADCAST_CHAT_USERS = "BROADCAST_CHAT_USERS";
+    public static String BROADCAST_MESSAGE_SEARCH = "BROADCAST_MESSAGE_SEARCH";
+
     @SerializedName("id")
     private long id ;
 

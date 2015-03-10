@@ -1,5 +1,7 @@
 package com.teachandroid.app.activity;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,20 +11,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.teachandroid.app.R;
-import com.teachandroid.app.data.Dialog;
 import com.teachandroid.app.data.KnownUsers;
 import com.teachandroid.app.data.Message;
 import com.teachandroid.app.data.User;
 import com.teachandroid.app.api.ApiFacadeService;
-import com.teachandroid.app.util.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +37,7 @@ public class MessageActivity extends ActionBarActivity {
     private List<ImageView> imageViewList = new ArrayList<ImageView>();
 
     public static String EXTRA_MESSAGE = "EXTRA_MESSAGE";
-    private static String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
-    private static String BROADCAST_CHAT_USERS = "BROADCAST_CHAT_USERS";
+
     private MessageReceiver receiverMessage;
     private UserReceiver receiverUser;
     private ChatUsersReceiver receiverChatUsers;
@@ -72,10 +72,47 @@ public class MessageActivity extends ActionBarActivity {
         chatUsersLinearLayout = (LinearLayout)findViewById(R.id.horizontal_linear_scroll);
 
         User user = KnownUsers.getInstance().getUserFromId(message.getUserId());
-        ImageLoader.getInstance().displayImage(user.getPhoto200(),imageView);
+        ImageLoader.getInstance().displayImage(user.getPhoto100(),imageView);
 
         textTitleData.setText(message.getTitle());
         textOwnerData.setText(user.getFirstName() + " - " +user.getLastName());
+
+        EditText editText = (EditText)findViewById(R.id.edit_send_message);
+        editText.clearFocus();
+        Button buttonSend = (Button)findViewById(R.id.button_send_message);
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText editText = (EditText)findViewById(R.id.edit_send_message);
+                if (editText.getText().toString().equals("")) {return;}
+
+                Intent intentForGetHistory = new Intent(v.getContext(), ApiFacadeService.class);
+                intentForGetHistory.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.send");
+                HashMap<String, String> parameters = new HashMap<String, String>();
+
+                if (message.getChatId() == 0) {
+                    parameters.put("user_id", message.getUserIdString());
+                } else {
+                    parameters.put("chat_id", "" + message.getChatId());
+                }
+                parameters.put("message", editText.getText().toString());
+
+                intentForGetHistory.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parameters);
+                intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, ApiFacadeService.RETURNED_TYPE_NO_RETURN);
+                intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, ApiFacadeService.RETURNED_TYPE_NO_RETURN);
+
+                startService(intentForGetHistory);
+                editText.setText("");
+//                Notification.Builder builder =
+//                        new Notification.Builder(v.getContext())
+//                                .setContentTitle(getString(R.string.text_send_message_to)+KnownUsers.getUserFromId(message.getUserId()).getFirstName()+" "+KnownUsers.getUserFromId(message.getUserId()).getLastName())
+//                                .setContentText(editText.getText().toString())
+//                                .setAutoCancel(true);
+//                NotificationManager mNotificationManager =
+//                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                mNotificationManager.notify(0, builder.getNotification());
+            }
+        });
     }
 
     @Override
@@ -113,18 +150,22 @@ public class MessageActivity extends ActionBarActivity {
 
     private void fillAndStartService(Message message) {
 
-        if (message.getChatId()==0) {
-            Intent intentForGetHistory = new Intent(this, ApiFacadeService.class);
-            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.getHistory");
-            HashMap<String, String> parametersForGetHistory = new HashMap<String, String>();
+        Intent intentForGetHistory = new Intent(this, ApiFacadeService.class);
+        intentForGetHistory.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.getHistory");
+        HashMap<String, String> parametersForGetHistory = new HashMap<String, String>();
+        if (message.getChatId() == 0) {
             parametersForGetHistory.put("user_id", message.getUserIdString());
-            parametersForGetHistory.put("chat_id", ""+message.getChatId());
-            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parametersForGetHistory);
-            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, BROADCAST_MESSAGE);
-            intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, Message.class.getName());
-
-            startService(intentForGetHistory);
         } else {
+            parametersForGetHistory.put("chat_id", "" + message.getChatId());
+        }
+        intentForGetHistory.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parametersForGetHistory);
+        intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, Message.BROADCAST_MESSAGE);
+        intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, Message.RETURNED_TYPE_MESSAGE);
+
+        startService(intentForGetHistory);
+    }
+    private void fillAndStartServiceForChatUser(Message message) {
+        if (message.getChatId()!=0) {
 
             Intent intentForChatUsers = new Intent(this, ApiFacadeService.class);
             intentForChatUsers.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.getChatUsers");
@@ -132,23 +173,20 @@ public class MessageActivity extends ActionBarActivity {
             parametersForChatUsers.put("chat_id", ""+message.getChatId());
             parametersForChatUsers.put("fields", "photo_50,photo_100,photo_200");
             intentForChatUsers.putExtra(ApiFacadeService.EXTRA_PARAMETERS, parametersForChatUsers);
-            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, BROADCAST_CHAT_USERS);
-            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, User.class.getName());
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, Message.BROADCAST_CHAT_USERS);
+            intentForChatUsers.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, User.RETURNED_TYPE_USER);
 
             startService(intentForChatUsers);
         }
-
-
-
     }
 
     private void registerAllNeededReceiver() {
         receiverMessage = new MessageReceiver();
-        registerReceiver(receiverMessage,new IntentFilter(BROADCAST_MESSAGE));
+        registerReceiver(receiverMessage,new IntentFilter(Message.BROADCAST_MESSAGE));
         receiverUser = new UserReceiver();
         registerReceiver(receiverUser,new IntentFilter(KnownUsers.BROADCAST_USER));
         receiverChatUsers = new ChatUsersReceiver();
-        registerReceiver(receiverChatUsers,new IntentFilter(BROADCAST_CHAT_USERS));
+        registerReceiver(receiverChatUsers,new IntentFilter(Message.BROADCAST_CHAT_USERS));
     }
 
     private void unRegisterAllNeededReceiver() {
@@ -162,9 +200,10 @@ public class MessageActivity extends ActionBarActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent == null ) {return;}
             ArrayList<Message> result;
-            result = intent.getParcelableArrayListExtra(BROADCAST_MESSAGE);
+            result = intent.getParcelableArrayListExtra(Message.BROADCAST_MESSAGE);
             messageAdapter.addAll(result);
             messageAdapter.notifyDataSetChanged();
+            fillAndStartServiceForChatUser(message);
         }
     }
     private class UserReceiver extends BroadcastReceiver {
@@ -193,7 +232,7 @@ public class MessageActivity extends ActionBarActivity {
                         startActivity(intent);
                     }
                 });
-                ImageLoader.getInstance().displayImage(KnownUsers.getInstance().getUserFromId(tempId).getPhoto100(), imageViewList.get(imageViewList.size()-1));
+                ImageLoader.getInstance().displayImage(KnownUsers.getInstance().getUserFromId(tempId).getPhoto50(), imageViewList.get(imageViewList.size()-1));
             }
         }
     }

@@ -34,6 +34,9 @@ public class ApiFacadeService extends Service {
     public static final String EXTRA_PARAMETERS = "EXTRA_PARAMETERS";
     public static final String EXTRA_RETURNED_BROADCAST_MESSAGE = "EXTRA_RETURNED_BROADCAST_MESSAGE";
     public static final String EXTRA_RETURNED_CLASS_NAME = "EXTRA_RETURNED_CLASS_NAME";
+    public  static String RETURNED_TYPE_NO_RETURN = "NO_RETURN";
+
+
 
     private static final String TAG = ApiFacadeService.class.getSimpleName();
 
@@ -45,7 +48,7 @@ public class ApiFacadeService extends Service {
     private String mainCommandForRequest ;
     private Map<String,String> parametersForRequest;
     private String returnedBroadcastMessage;
-    private Class typeOfReturnedData;
+    private String typeOfReturnedData;
 
     public ApiFacadeService() {
         Session session = SessionStore.restore(MyApplication.getContext());
@@ -62,7 +65,7 @@ public class ApiFacadeService extends Service {
             final HttpGet request = makeRequest();
             requestExecutor.execute(new Runnable() {
                 String threadReturnBroadcastMessage  = returnedBroadcastMessage;
-                String threadTypeOfReturnedData = typeOfReturnedData.getSimpleName();
+                String threadTypeOfReturnedData = typeOfReturnedData;
 
                 @Override
                 public void run() {
@@ -81,7 +84,7 @@ public class ApiFacadeService extends Service {
                 }
             });
         }
-        stopSelf();
+        stopSelf(startId);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -95,12 +98,7 @@ public class ApiFacadeService extends Service {
         mainCommandForRequest=intent.getStringExtra(EXTRA_MAIN_COMMAND);
         parametersForRequest = (Map<String, String>) intent.getSerializableExtra(EXTRA_PARAMETERS);
         returnedBroadcastMessage = intent.getStringExtra(EXTRA_RETURNED_BROADCAST_MESSAGE);
-        String className= intent.getStringExtra(EXTRA_RETURNED_CLASS_NAME);
-        try {
-            typeOfReturnedData =  Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        typeOfReturnedData = intent.getStringExtra(EXTRA_RETURNED_CLASS_NAME);
     }
     private HttpGet makeRequest(){
 
@@ -114,21 +112,21 @@ public class ApiFacadeService extends Service {
     private void sendResultData(String request, String localReturnedBroadcastMessage, String localTypeOfReturnedData){
         Boolean haveResult= false;
         Intent intent = new Intent(localReturnedBroadcastMessage);
-        if (localTypeOfReturnedData.equals("Dialog")) {
+        if (localTypeOfReturnedData.equals(Dialog.RETURNED_TYPE_DIALOG)) {
             ApiResponse<ResponseList<Dialog>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Dialog>>>() {}.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Dialog> result = (ArrayList<Dialog>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (localTypeOfReturnedData.equals("Message")) {
+        if (localTypeOfReturnedData.equals(Message.RETURNED_TYPE_MESSAGE)) {
             ApiResponse<ResponseList<Message>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Message>>>() { }.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Message> result = (ArrayList<Message>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (localTypeOfReturnedData.equals("User")) {
+        if (localTypeOfReturnedData.equals(User.RETURNED_TYPE_USER)) {
 
             ApiResponse<ArrayList<User>> apiResponse = new Gson().fromJson(request,new TypeToken<ApiResponse<ArrayList<User>>>(){}.getType());
             if(apiResponse != null && apiResponse.getResult()!=null){

@@ -21,7 +21,11 @@
     <string name="text_dialog_title">Title</string>
     <string name="text_message_body">Body</string>
     <string name="title_activity_user">UserActivity</string>
-    <string name="edit_text_send_message">send message</string>
+    <string name="edit_send_message">send message</string>
     <string name="button_send">send</string>
+    <string name="action_dialog_search">Search</string>
+    <string name="text_send_message">Send Message</string>
+    <string name="text_dialog_body">Body</string>
+    <string name="text_send_message_to">"Send message to "</string>
 
 </resources>

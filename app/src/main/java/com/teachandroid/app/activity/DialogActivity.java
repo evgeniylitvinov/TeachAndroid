@@ -174,7 +174,7 @@ public class DialogActivity extends Activity {
     private class DialogSearchReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Logger.log("DialogReceiver", "receive - %s", "***");
+            Logger.log("DialogReceiver", "receive - %s");
             if (intent == null ) {return;}
             ArrayList<Message> resultMessage;
             resultMessage = intent.getParcelableArrayListExtra(Message.BROADCAST_MESSAGE_SEARCH);

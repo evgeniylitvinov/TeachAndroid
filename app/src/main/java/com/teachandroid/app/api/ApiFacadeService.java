@@ -34,7 +34,7 @@ public class ApiFacadeService extends Service {
     public static final String EXTRA_PARAMETERS = "EXTRA_PARAMETERS";
     public static final String EXTRA_RETURNED_BROADCAST_MESSAGE = "EXTRA_RETURNED_BROADCAST_MESSAGE";
     public static final String EXTRA_RETURNED_CLASS_NAME = "EXTRA_RETURNED_CLASS_NAME";
-    public  static String RETURNED_TYPE_NO_RETURN = "NO_RETURN";
+    public static final String RETURNED_TYPE_NO_RETURN = "NO_RETURN";
 
 
 
@@ -116,14 +116,14 @@ public class ApiFacadeService extends Service {
             ApiResponse<ResponseList<Dialog>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Dialog>>>() {}.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Dialog> result = (ArrayList<Dialog>) apiResponse.getResult().getItems();
-            intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
+            intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
             haveResult = true;
         }
         if (localTypeOfReturnedData.equals(Message.RETURNED_TYPE_MESSAGE)) {
             ApiResponse<ResponseList<Message>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Message>>>() { }.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Message> result = (ArrayList<Message>) apiResponse.getResult().getItems();
-            intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
+            intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
             haveResult = true;
         }
         if (localTypeOfReturnedData.equals(User.RETURNED_TYPE_USER)) {
@@ -139,7 +139,7 @@ public class ApiFacadeService extends Service {
                     tempUser.setPhoto200(user.getPhoto200());
                     KnownUsers.getInstance().addUser(user.getId(), tempUser);
                     ArrayList<User> result = apiResponse.getResult();
-                    intent.putParcelableArrayListExtra(returnedBroadcastMessage,result);
+                    intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
                     haveResult = true;
                 }
             }else {

@@ -163,8 +163,7 @@ public class MessageActivity extends ActionBarActivity {
         intentForGetHistory.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, Message.RETURNED_TYPE_MESSAGE);
 
         startService(intentForGetHistory);
-    }
-    private void fillAndStartServiceForChatUser(Message message) {
+
         if (message.getChatId()!=0) {
 
             Intent intentForChatUsers = new Intent(this, ApiFacadeService.class);
@@ -203,7 +202,6 @@ public class MessageActivity extends ActionBarActivity {
             result = intent.getParcelableArrayListExtra(Message.BROADCAST_MESSAGE);
             messageAdapter.addAll(result);
             messageAdapter.notifyDataSetChanged();
-            fillAndStartServiceForChatUser(message);
         }
     }
     private class UserReceiver extends BroadcastReceiver {

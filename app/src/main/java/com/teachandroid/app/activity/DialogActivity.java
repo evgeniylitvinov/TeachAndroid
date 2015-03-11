@@ -34,11 +34,12 @@ public class DialogActivity extends Activity {
 
     private DialogAdapter dialogAdapter;
     private ListView dialogList;
+    private SearchView actionView;
 
     private DialogReceiver receiverDialog;
     private DialogSearchReceiver receiverDialogSearch;
     private UserReceiver receiverUser;
-    private SearchView actionView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,6 @@ public class DialogActivity extends Activity {
                 fillAndStartServiceSearch(query);
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return true;
@@ -105,15 +105,14 @@ public class DialogActivity extends Activity {
             TextView dialogUnreadMessageData = (TextView) convertView.findViewById(R.id.text_dialog_unread_message_data);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_dialog);
 
-            Dialog item = getItem(position);
-            Message message = item.getMessage();
+            Dialog dialog = getItem(position);
+            Message message = dialog.getMessage();
             if (message==null) {return convertView;}
             User user = KnownUsers.getInstance().getUserFromId(message.getUserId());
-            if (user==null) {return convertView;}
             dialogOwnerData.setText(user.getFirstName()+" - "+user.getLastName());
-            dialogTitleData.setText(item.getMessage().getTitle());
-            dialogBodyData.setText(item.getMessage().getBody());
-            dialogUnreadMessageData.setText(""+item.getUnread());
+            dialogTitleData.setText(dialog.getMessage().getTitle());
+            dialogBodyData.setText(dialog.getMessage().getBody());
+            dialogUnreadMessageData.setText("" + dialog.getUnread());
             ImageLoader.getInstance().displayImage(user.getPhoto100(),imageView);
 
             return convertView;
@@ -125,30 +124,31 @@ public class DialogActivity extends Activity {
         HashMap<String,String> parameters = new HashMap<String, String>();
         parameters.put("count", "20");
         intent.putExtra(ApiFacadeService.EXTRA_PARAMETERS,parameters);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, Dialog.BROADCAST_DIALOG);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME,Dialog.RETURNED_TYPE_DIALOG);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, ApiFacadeService.BROADCAST_DIALOG);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, ApiFacadeService.RETURNED_TYPE_DIALOG);
 
         startService(intent);
     }
+
     private void fillAndStartServiceSearch(String query) {
         Intent intent = new Intent(this,ApiFacadeService.class);
         intent.putExtra(ApiFacadeService.EXTRA_MAIN_COMMAND, "messages.search");
         HashMap<String,String> parameters = new HashMap<String, String>();
         parameters.put("q", query);
         intent.putExtra(ApiFacadeService.EXTRA_PARAMETERS,parameters);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, Message.BROADCAST_MESSAGE_SEARCH);
-        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME,Message.RETURNED_TYPE_MESSAGE);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_BROADCAST_MESSAGE, ApiFacadeService.BROADCAST_MESSAGE_SEARCH);
+        intent.putExtra(ApiFacadeService.EXTRA_RETURNED_CLASS_NAME, ApiFacadeService.RETURNED_TYPE_MESSAGE);
 
         startService(intent);
     }
 
     private void registerAllNeededReceiver() {
         receiverDialog = new DialogReceiver();
-        registerReceiver(receiverDialog, new IntentFilter(Dialog.BROADCAST_DIALOG));
+        registerReceiver(receiverDialog, new IntentFilter(ApiFacadeService.BROADCAST_DIALOG));
         receiverDialogSearch = new DialogSearchReceiver();
-        registerReceiver(receiverDialogSearch, new IntentFilter(Message.BROADCAST_MESSAGE_SEARCH));
+        registerReceiver(receiverDialogSearch, new IntentFilter(ApiFacadeService.BROADCAST_MESSAGE_SEARCH));
         receiverUser = new UserReceiver();
-        registerReceiver(receiverUser, new IntentFilter(KnownUsers.BROADCAST_USER));
+        registerReceiver(receiverUser, new IntentFilter(ApiFacadeService.BROADCAST_USER));
     }
 
     private void unRegisterAllNeededReceiver() {
@@ -157,15 +157,12 @@ public class DialogActivity extends Activity {
         unregisterReceiver(receiverUser);
     }
 
-
-
-
     private class DialogReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null ) {return;}
             ArrayList<Dialog> result;
-            result = intent.getParcelableArrayListExtra(Dialog.BROADCAST_DIALOG);
+            result = intent.getParcelableArrayListExtra(ApiFacadeService.BROADCAST_DIALOG);
             dialogAdapter.addAll(result);
             dialogAdapter.notifyDataSetChanged();
         }
@@ -177,7 +174,7 @@ public class DialogActivity extends Activity {
             Logger.log("DialogReceiver", "receive - %s");
             if (intent == null ) {return;}
             ArrayList<Message> resultMessage;
-            resultMessage = intent.getParcelableArrayListExtra(Message.BROADCAST_MESSAGE_SEARCH);
+            resultMessage = intent.getParcelableArrayListExtra(ApiFacadeService.BROADCAST_MESSAGE_SEARCH);
             ArrayList<Dialog> resultDialogs = new ArrayList<Dialog>();
             Dialog tempDialog;
             dialogAdapter.clear();
@@ -188,7 +185,6 @@ public class DialogActivity extends Activity {
             dialogAdapter.addAll(resultDialogs);
             dialogAdapter.notifyDataSetChanged();
             actionView.setIconified(true);
-
         }
     }
 

@@ -34,9 +34,17 @@ public class ApiFacadeService extends Service {
     public static final String EXTRA_PARAMETERS = "EXTRA_PARAMETERS";
     public static final String EXTRA_RETURNED_BROADCAST_MESSAGE = "EXTRA_RETURNED_BROADCAST_MESSAGE";
     public static final String EXTRA_RETURNED_CLASS_NAME = "EXTRA_RETURNED_CLASS_NAME";
+
+    public static final String RETURNED_TYPE_DIALOG = "DIALOG";
+    public static final String RETURNED_TYPE_USER = "USER";
+    public static final String RETURNED_TYPE_MESSAGE = "MESSAGE";
     public static final String RETURNED_TYPE_NO_RETURN = "NO_RETURN";
 
-
+    public static final String BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
+    public static final String BROADCAST_CHAT_USERS = "BROADCAST_CHAT_USERS";
+    public static final String BROADCAST_MESSAGE_SEARCH = "BROADCAST_MESSAGE_SEARCH";
+    public static final String BROADCAST_DIALOG = "BROADCAST_DIALOG";
+    public static final String BROADCAST_USER = "BROADCAST_USER";
 
     private static final String TAG = ApiFacadeService.class.getSimpleName();
 
@@ -102,9 +110,9 @@ public class ApiFacadeService extends Service {
     }
     private HttpGet makeRequest(){
 
-        RequestBuilder builder = new VkRequestBuilder(mainCommandForRequest, accessToken);  //make request
-        for (String hm :parametersForRequest.keySet()) {
-            builder.addParam(hm,parametersForRequest.get(hm));
+        RequestBuilder builder = new VkRequestBuilder(mainCommandForRequest, accessToken);
+        for (String tempKey :parametersForRequest.keySet()) {
+            builder.addParam(tempKey,parametersForRequest.get(tempKey));
         }
         String query = builder.query();
         return new HttpGet(query);
@@ -112,21 +120,21 @@ public class ApiFacadeService extends Service {
     private void sendResultData(String request, String localReturnedBroadcastMessage, String localTypeOfReturnedData){
         Boolean haveResult= false;
         Intent intent = new Intent(localReturnedBroadcastMessage);
-        if (localTypeOfReturnedData.equals(Dialog.RETURNED_TYPE_DIALOG)) {
+        if (localTypeOfReturnedData.equals(RETURNED_TYPE_DIALOG)) {
             ApiResponse<ResponseList<Dialog>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Dialog>>>() {}.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Dialog> result = (ArrayList<Dialog>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (localTypeOfReturnedData.equals(Message.RETURNED_TYPE_MESSAGE)) {
+        if (localTypeOfReturnedData.equals(RETURNED_TYPE_MESSAGE)) {
             ApiResponse<ResponseList<Message>> apiResponse = new Gson().fromJson(request, new TypeToken<ApiResponse<ResponseList<Message>>>() { }.getType());
             if (apiResponse == null || apiResponse.getResult()==null) {return;}
             ArrayList<Message> result = (ArrayList<Message>) apiResponse.getResult().getItems();
             intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
             haveResult = true;
         }
-        if (localTypeOfReturnedData.equals(User.RETURNED_TYPE_USER)) {
+        if (localTypeOfReturnedData.equals(RETURNED_TYPE_USER)) {
 
             ApiResponse<ArrayList<User>> apiResponse = new Gson().fromJson(request,new TypeToken<ApiResponse<ArrayList<User>>>(){}.getType());
             if(apiResponse != null && apiResponse.getResult()!=null){
@@ -138,10 +146,11 @@ public class ApiFacadeService extends Service {
                     tempUser.setPhoto100(user.getPhoto100());
                     tempUser.setPhoto200(user.getPhoto200());
                     KnownUsers.getInstance().addUser(user.getId(), tempUser);
-                    ArrayList<User> result = apiResponse.getResult();
-                    intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
-                    haveResult = true;
                 }
+                ArrayList<User> result = apiResponse.getResult();
+                intent.putParcelableArrayListExtra(localReturnedBroadcastMessage,result);
+                haveResult = true;
+
             }else {
             }
         }

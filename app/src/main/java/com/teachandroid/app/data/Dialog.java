@@ -8,9 +8,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class Dialog implements Parcelable{
 
-    public static String BROADCAST_DIALOG = "BROADCAST_DIALOG";
-    public  static String RETURNED_TYPE_DIALOG = "DIALOG";
-
     @SerializedName("unread")
     private int unread;
 

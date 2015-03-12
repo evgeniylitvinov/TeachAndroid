@@ -5,8 +5,11 @@ import android.content.Intent;
 import com.teachandroid.app.LoaderApplication;
 import com.teachandroid.app.api.ApiFacadeService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by George on 10.03.2015.
@@ -48,5 +51,11 @@ public class KnownUsers {
             LoaderApplication.getContext().startService(intent);
         }
         return returnUser;
+    }
+
+    public static Set<Long> getAllKnownUsers(){
+        Set<Long> resultSet = knownUsers.keySet();
+        resultSet.remove(1L);
+        return resultSet;
     }
 }

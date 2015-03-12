@@ -12,7 +12,6 @@ import com.teachandroid.app.R;
 import com.teachandroid.app.api.ApiFacade;
 import com.teachandroid.app.api.SimpleResponseListener;
 import com.teachandroid.app.data.Audio;
-import com.teachandroid.app.data.Video;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class AudioActivity extends ActionBarActivity {
         audioList.setAdapter(audioAdapter);
 
         ApiFacade facade = new ApiFacade(this);
-        facade.searchAudio("Beatles", new SimpleResponseListener<List<Audio>>(){
+        facade.getAudio(new SimpleResponseListener<List<Audio>>(){
             @Override
             public void onResponse(final List<Audio> response) {
                 super.onResponse(response);

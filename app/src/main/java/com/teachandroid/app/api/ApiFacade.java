@@ -3,26 +3,19 @@ package com.teachandroid.app.api;
 import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.teachandroid.app.api.reponse.*;
+import com.teachandroid.app.api.reponse.ApiResponse;
 import com.teachandroid.app.api.reponse.Error;
-import com.teachandroid.app.data.Audio;
-import com.teachandroid.app.data.Friend;
-import com.teachandroid.app.data.Group;
-import com.teachandroid.app.data.Photo;
-import com.teachandroid.app.data.Session;
-import com.teachandroid.app.data.Video;
+import com.teachandroid.app.api.reponse.ResponseList;
+import com.teachandroid.app.data.*;
 import com.teachandroid.app.store.SessionStore;
 import com.teachandroid.app.util.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -42,6 +35,8 @@ public class ApiFacade {
 
     private final Executor requestExecutor = Executors.newFixedThreadPool(3);
 
+    private final static int DEFAULT_MAX_COUNT = 100;
+
     public ApiFacade(Context context) {
         Session session = SessionStore.restore(context);
         this.accessToken = session.getAccessToken();
@@ -50,402 +45,120 @@ public class ApiFacade {
     }
 
 
-    public void getVideo(final ResponseListener<List<Video>> listener){
+    public void getVideo(ResponseListener<List<Video>> listener) {
         RequestBuilder builder = new VkRequestBuilder("video.get", accessToken);
-       // builder.addParam("count", "100");
-      //  builder.addParam("extended","1");
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
 
-        String query = builder.query();
-        Logger.log(TAG, "api request " + query);
+        Type type = new TypeToken<ApiResponse<ResponseList<Video>>>() {
+        }.getType();
 
-        final HttpGet request = new HttpGet(query);
-        requestExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse response = httpClient.execute(request);
+        executeGetRequest(builder, type, listener);
+    }
 
-                    //BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                    String responseString = EntityUtils.toString(response.getEntity());
-                    Logger.log(TAG,"json video request " + responseString);
+    public void searchVideo(String keyWord, ResponseListener<List<Video>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("video.search", accessToken);
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
+        builder.addParam("q", keyWord);
 
-                    ApiResponse<ResponseList<Video>> apiResponse = new Gson().fromJson(responseString, new TypeToken<ApiResponse<ResponseList<Video>>>() {
-                    }.getType());
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
+        Type type = new TypeToken<ApiResponse<ResponseList<Video>>>() {
+        }.getType();
+
+        executeGetRequest(builder, type, listener);
 
     }
 
-    public void searchVideo(final String videoKeyWord, final ResponseListener<List<Video>> listener) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
-                urlBuilder.append("video.search");
-                urlBuilder.append("?");
-                try {
-                    urlBuilder.append("q").append("=").append(URLEncoder.encode(videoKeyWord, "UTF-8")).append("&");
-                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
-                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
-                }catch (UnsupportedEncodingException e){
-                    e.printStackTrace();
-                }
-                HttpURLConnection connection = null;
-                try {
-                    String urlString = urlBuilder.toString();
-
-                    Logger.log(TAG, "url request " + urlString);
-
-                    URL url = new URL(urlString);
-                    connection = (HttpURLConnection) url.openConnection();
-                    InputStream in = connection.getInputStream();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String response = null;
-                    while ((response = reader.readLine()) != null){
-                        Logger.log(TAG, "url response " + response);
-                    }
-
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<ApiResponse<ResponseList<Video>>>() {
-                    }.getType();
-
-                    ApiResponse<ResponseList<Video>> apiResponse = gson.fromJson(response, type);
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-            }
-        }).start();
-
-    }
-
-
-
-    public void getAudio(final ResponseListener<List<Audio>> listener){
+    public void getAudio(ResponseListener<List<Audio>> listener) {
         RequestBuilder builder = new VkRequestBuilder("audio.get", accessToken);
-        builder.addParam("count", "100");
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
 
-        String query = builder.query();
-        Logger.log(TAG, "api request " + query);
+        Type type = new TypeToken<ApiResponse<ResponseList<Audio>>>() {
+        }.getType();
 
-        final HttpGet request = new HttpGet(query);
-        requestExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse response = httpClient.execute(request);
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-                    ApiResponse<ResponseList<Audio>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Audio>>>() {
-                    }.getType());
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
+        executeGetRequest(builder, type, listener);
     }
 
-    /*public void getVideoVK() throws UnsupportedEncodingException {
+    public void getAudioAlbums(ResponseListener<List<AudioAlbum>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("audio.getAlbums", accessToken);
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
-                urlBuilder.append("video.get");
-                urlBuilder.append("?");
-                try {
-                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
-                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+        Type type = new TypeToken<ApiResponse<ResponseList<AudioAlbum>>>() {
+        }.getType();
 
-                HttpURLConnection connection = null;
-
-                try {
-                    String urlString = urlBuilder.toString();
-
-                    Logger.log(TAG, "запрос " + urlString);
-                    URL url = new URL(urlString);
-                    connection = (HttpURLConnection) url.openConnection();
-                    InputStream in = connection.getInputStream();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        Logger.log(TAG, "ответ " + line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-
-            }
-        }).start();
-    }*/
-
-
-
-
-    public void getPhotos() throws UnsupportedEncodingException {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
-                urlBuilder.append("photos.get");
-                urlBuilder.append("?");
-                try {
-                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
-                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                HttpURLConnection connection = null;
-
-                try {
-                    String urlString = urlBuilder.toString();
-
-                    Logger.log(TAG, "запрос " + urlString);
-                    URL url = new URL(urlString);
-                    connection = (HttpURLConnection) url.openConnection();
-                    InputStream in = connection.getInputStream();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        Logger.log(TAG, "ответ " + line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-
-            }
-        }).start();
+        executeGetRequest(builder, type, listener);
     }
 
-    public void getGroups(final ResponseListener<List<Group>> listener){
+    public void getPhotos(long albumId, ResponseListener<List<Photo>> listener) {
+
+        RequestBuilder builder = new VkRequestBuilder("photos.get", accessToken);
+        builder.addParam("album_id", String.valueOf(albumId));
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
+
+        Type type = new TypeToken<ApiResponse<ResponseList<Photo>>>() {
+        }.getType();
+
+        executeGetRequest(builder, type, listener);
+    }
+
+    public void getGroups(ResponseListener<List<Group>> listener) {
         RequestBuilder builder = new VkRequestBuilder("groups.get", accessToken);
-        builder.addParam("count", "100");
-        builder.addParam("extended","1");
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
+        builder.addParam("extended", "1");
 
-        String query = builder.query();
-        Logger.log(TAG, "api request " + query);
+        Type type = new TypeToken<ApiResponse<ResponseList<Group>>>() {
+        }.getType();
 
-        final HttpGet request = new HttpGet(query);
-        requestExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse response = httpClient.execute(request);
-
-                    //BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                    String responseString = EntityUtils.toString(response.getEntity());
-                    Logger.log(TAG,"json groups request " + responseString);
-
-                    ApiResponse<ResponseList<Group>> apiResponse = new Gson().fromJson(responseString, new TypeToken<ApiResponse<ResponseList<Group>>>() {
-                    }.getType());
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-
+        executeGetRequest(builder, type, listener);
     }
 
     public void getFriends(final ResponseListener<List<Friend>> listener) {
         RequestBuilder builder = new VkRequestBuilder("friends.get", accessToken);
-        builder.addParam("count", "100");
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
         builder.addParam("fields", "nicхkname,photo_200_orig,photo_100");
-        String query = builder.query();
-        Logger.log(TAG, "api request " + query);
 
-        final HttpGet request = new HttpGet(query);
+        Type type = new TypeToken<ApiResponse<ResponseList<Friend>>>() {
+        }.getType();
 
-        requestExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse response = httpClient.execute(request);
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-                    ApiResponse<ResponseList<Friend>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Friend>>>() {
-                    }.getType());
-                    if (apiResponse != null) {
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    } else {
-                        listener.onError(new Error());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        executeGetRequest(builder, type, listener);
     }
 
-    public void searchAudio(final String audioKeyWord, final ResponseListener<List<Audio>> listener) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
-                urlBuilder.append("audio.search");
-                urlBuilder.append("?");
-                try {
-                    urlBuilder.append("q").append("=").append(URLEncoder.encode(audioKeyWord, "UTF-8")).append("&");
-                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
-                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
-                }catch (UnsupportedEncodingException e){
-                    e.printStackTrace();
-                }
-                HttpURLConnection connection = null;
-                try {
-                    String urlString = urlBuilder.toString();
+    public void searchAudio(String audioKeyWord, ResponseListener<List<Audio>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("audio.search", accessToken);
+        builder.addParam("q", audioKeyWord);
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
 
-                    Logger.log(TAG, "url request " + urlString);
-
-                    URL url = new URL(urlString);
-                    connection = (HttpURLConnection) url.openConnection();
-                    InputStream in = connection.getInputStream();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String response = null;
-                    while ((response = reader.readLine()) != null){
-                        Logger.log(TAG, "url response " + response);
-                    }
-
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<ApiResponse<ResponseList<Audio>>>() {
-                    }.getType();
-
-                    ApiResponse<ResponseList<Audio>> apiResponse = gson.fromJson(response, type);
-                    if(apiResponse != null){
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    }else {
-                        listener.onError(new Error());
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-            }
-        }).start();
+        Type type = new TypeToken<ApiResponse<ResponseList<Audio>>>() {
+        }.getType();
+        executeGetRequest(builder, type, listener);
     }
 
+    public void getPhotoFromProfile(final ResponseListener<List<Photo>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("photos.getProfile", accessToken);
 
-    public void getPhoto(final ResponseListener<List<Photo>> listener) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder urlBuilder = new StringBuilder("https://api.vk.com/method/");
-                urlBuilder.append("photos.getProfile");
-                urlBuilder.append("?");
-                try {
-                    urlBuilder.append("owner_id").append("=").append(URLEncoder.encode(userId, "UTF-8")).append("&");
-                    urlBuilder.append("count").append("=").append(URLEncoder.encode("100", "UTF-8")).append("&");
-                    urlBuilder.append("v").append("=").append(URLEncoder.encode("5.28", "UTF-8")).append("&");
-                    urlBuilder.append("access_token").append("=").append(URLEncoder.encode(accessToken, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                HttpURLConnection connection = null;
-                try {
-                    String urlString = urlBuilder.toString();
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
 
-                    Logger.log(TAG, "ФОТО ЗАПРОС " + urlString);
-                    URL url = new URL(urlString);
-                    connection = (HttpURLConnection) url.openConnection();
-                    InputStream in = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    StringBuilder response = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
-                        Logger.log(TAG, "ФОТО ОТВЕТ " + line);
-                        response.append(line);
-                    }
-
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<ApiResponse<ResponseList<Photo>>>() {
-                    }.getType();
-
-                    ApiResponse<ResponseList<Photo>> apiResponse = gson.fromJson(response.toString(), type);
-                    if (apiResponse != null) {
-                        listener.onResponse(apiResponse.getResult().getItems());
-                        listener.onError(apiResponse.getError());
-                    } else {
-                        listener.onError(new Error());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-            }
-        }).start();
+        Type type = new TypeToken<ApiResponse<ResponseList<Photo>>>() {
+        }.getType();
+        executeGetRequest(builder, type, listener);
     }
 
- /*   public void getPhotoAll(final ResponseListener<List<Photo>> listener) {
+    public void getPhotoAll(final ResponseListener<List<Photo>> listener) {
         RequestBuilder builder = new VkRequestBuilder("photos.getAll", accessToken);
 
-        builder.addParam("count", "100");
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
         builder.addParam("extended", "1");
+
+        Type type = new TypeToken<ApiResponse<ResponseList<Photo>>>() {
+        }.getType();
+        executeGetRequest(builder, type, listener);
+    }
+
+    private <T> void executeGetRequest(RequestBuilder builder, final Type type, final ResponseListener<List<T>> listener) {
         String query = builder.query();
-        Logger.log(TAG, "api request - %s", query);
+
+        Logger.log(TAG, "api request - " + query);
 
         final HttpGet request = new HttpGet(query);
+
         requestExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -454,8 +167,7 @@ public class ApiFacade {
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-                    ApiResponse<ResponseList<Photo>> apiResponse = new Gson().fromJson(reader, new TypeToken<ApiResponse<ResponseList<Photo>>>() {
-                    }.getType());
+                    ApiResponse<ResponseList<T>> apiResponse = new Gson().fromJson(reader, type);
                     if (apiResponse != null) {
                         listener.onResponse(apiResponse.getResult().getItems());
                         listener.onError(apiResponse.getError());
@@ -467,6 +179,6 @@ public class ApiFacade {
                 }
             }
         });
-    }*/
+    }
 
 }

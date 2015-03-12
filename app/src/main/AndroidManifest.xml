@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.AudioActivity" />
+        <activity android:name=".activity.AudioActivity"
+                android:label="@string/audios"/>
         <activity
             android:name=".activity.GroupsActivity"
             android:label="@string/title_activity_groups"></activity>

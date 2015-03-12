@@ -1,8 +1,8 @@
 package com.teachandroid.app.activity;
 
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -35,7 +35,7 @@ public class AudioActivity extends ActionBarActivity {
         audioList.setAdapter(audioAdapter);
 
         ApiFacade facade = new ApiFacade(this);
-        facade.getAudio(new SimpleResponseListener<List<Audio>>(){
+        facade.getAudio(new SimpleResponseListener<List<Audio>>() {
             @Override
             public void onResponse(final List<Audio> response) {
                 super.onResponse(response);
@@ -51,7 +51,7 @@ public class AudioActivity extends ActionBarActivity {
     }
 
 
-    private static final class AudioAdapter extends ArrayAdapter<Audio>{
+    private static final class AudioAdapter extends ArrayAdapter<Audio> {
 
         public AudioAdapter(Context context, List<Audio> objects) {
             super(context, 0, objects);
@@ -59,17 +59,26 @@ public class AudioActivity extends ActionBarActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null){
+            if (convertView == null) {
                 convertView = View.inflate(getContext(), R.layout.list_item_audio, null);
             }
             TextView titleView = (TextView) convertView.findViewById(R.id.text_title);
             TextView artistView = (TextView) convertView.findViewById(R.id.text_artist);
+            TextView durationView = (TextView) convertView.findViewById(R.id.text_duration);
 
             Audio item = getItem(position);
 
             titleView.setText(item.getTitle());
             artistView.setText(item.getArtist());
+            durationView.setText(durationToString(item.getDuration()));
             return convertView;
         }
+    }
+
+    private static String durationToString(int duration){
+        int hours = duration / 3600;
+        int minutes = (duration % 3600) / 60;
+        int seconds = duration % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 }

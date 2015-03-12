@@ -40,4 +40,8 @@ public class Audio {
     public String getTitle() {
         return title;
     }
+
+    public int getDuration() {
+        return duration;
+    }
 }

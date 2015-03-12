@@ -83,7 +83,6 @@ public class LoginActivity extends Activity {
                 }
             }, 1500);
         }
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getApplicationContext()));
     }
 
     private class VkClient extends WebViewClient {

@@ -31,7 +31,6 @@ public class FriendActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
-        imageLoaderInit(getApplication());
 
         ListView friendList;
         friendAdapter = new FriendAdapter(this, new ArrayList<Friend>());
@@ -51,19 +50,6 @@ public class FriendActivity extends ActionBarActivity {
         });
             }
         });
-    }
-
-    private void imageLoaderInit(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .denyCacheImageMultipleSizesInMemory()
-                .diskCacheFileNameGenerator(new Md5FileNameGenerator())
-                .diskCacheSize(50 * 1024 * 1024) // 50 Mb
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .writeDebugLogs() // Remove for release app
-                .build();
-
-        ImageLoader.getInstance().init(config);
     }
 
 

@@ -61,6 +61,7 @@
             android:label="@string/title_activity_user"
             android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
+        <activity android:name=".activity.AudioAlbumsActivity" android:label="@string/audios"/>
     </application>
 
 </manifest>

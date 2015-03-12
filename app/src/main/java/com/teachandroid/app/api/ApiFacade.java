@@ -77,6 +77,17 @@ public class ApiFacade {
         executeGetRequest(builder, type, listener);
     }
 
+    public void getAudio(long albumId, ResponseListener<List<Audio>> listener) {
+        RequestBuilder builder = new VkRequestBuilder("audio.get", accessToken);
+        builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));
+        builder.addParam("album_id", String.valueOf(albumId));
+
+        Type type = new TypeToken<ApiResponse<ResponseList<Audio>>>() {
+        }.getType();
+
+        executeGetRequest(builder, type, listener);
+    }
+
     public void getAudioAlbums(ResponseListener<List<AudioAlbum>> listener) {
         RequestBuilder builder = new VkRequestBuilder("audio.getAlbums", accessToken);
         builder.addParam("count", String.valueOf(DEFAULT_MAX_COUNT));

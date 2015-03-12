@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.button_audio).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AudioActivity.class));
+                startActivity(new Intent(MainActivity.this, AudioAlbumsActivity.class));
             }
         });
 

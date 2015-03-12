@@ -1,8 +1,12 @@
 package com.teachandroid.app.activity;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,39 +21,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AudioActivity extends ActionBarActivity {
+public class AudioActivity extends Activity {
 
-    private AudioAdapter audioAdapter;
-
-    private ListView audioList;
+    public static final String EXTRA_ALBUM_ID = "album_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_audio);
-
-        audioAdapter = new AudioAdapter(this, new ArrayList<Audio>());
-
-        audioList = (ListView) findViewById(R.id.list_audio);
-
-        audioList.setAdapter(audioAdapter);
-
-        ApiFacade facade = new ApiFacade(this);
-        facade.getAudio(new SimpleResponseListener<List<Audio>>() {
-            @Override
-            public void onResponse(final List<Audio> response) {
-                super.onResponse(response);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        audioAdapter.addAll(response);
-                    }
-                });
-
-            }
-        });
+        long albumId = getIntent().getLongExtra(EXTRA_ALBUM_ID, -1);
+        if(savedInstanceState == null){
+            getFragmentManager().beginTransaction()
+                    .add(android.R.id.content, AudioListFragment.create(albumId))
+                    .commit();
+        }
     }
 
+    public static class AudioListFragment extends Fragment {
+
+        private AudioAdapter audioAdapter;
+
+        private ListView audioList;
+
+        public static Fragment create(long albumId){
+            Bundle arg = new Bundle();
+            arg.putLong(EXTRA_ALBUM_ID, albumId);
+
+            Fragment fragment = new AudioListFragment();
+            fragment.setArguments(arg);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.activity_audio, null);
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            audioList = (ListView) view.findViewById(R.id.list_audio);
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            audioAdapter = new AudioAdapter(getActivity(), new ArrayList<Audio>());
+
+
+
+            audioList.setAdapter(audioAdapter);
+
+            ApiFacade facade = new ApiFacade(getActivity());
+            long albumId = getArguments().getLong(EXTRA_ALBUM_ID);
+            facade.getAudio(albumId, new SimpleResponseListener<List<Audio>>() {
+                @Override
+                public void onResponse(final List<Audio> response) {
+                    super.onResponse(response);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            audioAdapter.addAll(response);
+                        }
+                    });
+                }
+            });
+        }
+    }
 
     private static final class AudioAdapter extends ArrayAdapter<Audio> {
 
